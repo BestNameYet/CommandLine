@@ -18,7 +18,9 @@ function displayResponse(command,responseText){
  if(command.command==='local/read'&&parsed&&typeof parsed.content==='string'){
   return {label:'File contents — '+String(parsed.path||command.parameters?.path||'requested file'),content:parsed.content,language:'text'};
  }
- return {label:'API response',content:JSON.stringify(parsed,null,2),language:'json'};
+ const commit=parsed?.commit;
+ if(commit?.sha){return {label:'Commit',content:'Commit: '+commit.sha+'\\nVerified: '+String(commit.verification?.verified===true),language:'text'};}
+ return {label:'Result',content:parsed?.message?String(parsed.message):'Completed; no commit verification supplied.',language:'text'};
 }
 function chunks(value,size=CHUNK_SIZE){
  const points=Array.from(value),out=[];
