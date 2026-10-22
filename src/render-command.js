@@ -28,7 +28,7 @@ function chunks(value,size=CHUNK_SIZE){
 function renderCommandResult({issueNumber,commentId,marker,command,result,responseText=''}){
  if(!Number.isSafeInteger(issueNumber)||issueNumber<1)throw Error('Valid originating issue number required');
  if(!command||typeof command.command!=='string')throw Error('Command identifier required');
- if(typeof marker!=='string'||!/^<!-- github-command-receipt:\d+:[a-f0-9]{64} -->$/.test(marker))throw Error('Valid receipt marker required');
+ if(typeof marker!=='string'||!/^<!-- command-nonce:[a-f0-9]{64} -->$/.test(marker))throw Error('Valid receipt marker required');
  const status=result?.status===undefined?'unconfirmed':String(result.status);
  const outcome=result?.ok===true?'Succeeded':result?.ok===false?'Failed':'Unconfirmed';
  const body=displayResponse(command,String(responseText));
