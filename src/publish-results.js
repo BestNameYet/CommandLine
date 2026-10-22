@@ -56,7 +56,16 @@ async function main(env=process.env){
  }
  const token=env.COMMAND_API_TOKEN,repo=env.GITHUB_REPOSITORY;
  if(!token||!repo)throw Error('Missing issue publication credentials');
- for(const part of parts)await control(token,repo,'/issues/'+config.issueNumber+'/comments','POST',{body:part});
+ if(config.issueNumber!==queue.issue.number)throw Error('Cannot render to a different issue in source-comment mode');
+ const comment=await control(token,repo,'/issues/comments/'+queue.comment.id);
+ if(comment.issue_url!=='https://api.github.com/repos/'+repo+'/issues/'+queue.issue.number)throw Error('Source comment is outside originating issue');
+ const additions=queue.results.filter(x=>!x.result?.skipped&&!comment.body.includes(x.marker));
+ if(!additions.length)return;
+ const rendered=render({...queue,results:additions},config.format).join('\n\n');
+ const markerList=additions.map(x=>x.marker).join('\n');
+ const separator='<!-- command-results:start -->';
+ const suffix=(comment.body.includes(separator)?'\n\n':'\n\n'+separator+'\n\n')+markerList+'\n\n'+rendered;
+ await control(token,repo,'/issues/comments/'+queue.comment.id,'PATCH',{body:comment.body+suffix});
 }
 if(require.main===module){if(process.argv[2]==='append'){try{appendResult();}catch(e){console.error(e);process.exitCode=1;}}else main().catch(e=>{console.error(e);process.exitCode=1;});}
 module.exports={main,policy,render,appendResult};
