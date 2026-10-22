@@ -36,6 +36,10 @@
     ".github/workflows/commandline-issue.yml": {
       "description": "Routes authorized issue comments through parser and runner.",
       "category": "automation"
+    },
+    "src/command-catalog.json": {
+      "description": "Imported GitHub operation catalog used by command executor.",
+      "category": "configuration"
     }
   }
 }
