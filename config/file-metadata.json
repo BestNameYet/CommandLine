@@ -18,7 +18,7 @@
       "category": "automation"
     },
     "src/issue-command.js": {
-      "description": "Executes validated commands, supports zero-argument local catalog retrieval, and returns structured results without publishing.",
+      "description": "Executes validated repository commands and scoped Issue #1 comment deletion with target verification; returns structured results without publishing.",
       "category": "source"
     },
     "src/render-command.js": {
