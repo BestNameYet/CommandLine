@@ -2,15 +2,6 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const MARKER='<!-- github-command-surface:v1 -->';
 const {renderCommandResult}=require('./render-command.js');
-function parse(body){
- const text=body.trim(),match=text.match(/^```(?:json)?\s*\n([\s\S]*?)\n```$/i);
- const c=JSON.parse(match?match[1]:text);
- if(!c||typeof c!=='object'||Array.isArray(c)||c.version!==1||typeof c.command!=='string')throw Error('Expected {"version":1,"command":"operation/id","parameters":{},"body":{}}');
- if(Object.keys(c).some(k=>!['version','command','parameters','body','body_base64','headers'].includes(k)))throw Error('Unknown command field');
- if(c.parameters!==undefined&&(!c.parameters||typeof c.parameters!=='object'||Array.isArray(c.parameters)))throw Error('parameters must be an object');
- if(c.headers!==undefined&&(!c.headers||typeof c.headers!=='object'||Array.isArray(c.headers)))throw Error('headers must be an object');
- return c;
-}
 function localStat(root,relative){
  if(typeof relative!=='string'||!relative||path.isAbsolute(relative)||relative.split(/[\\/]/).some(p=>!p||p==='.'||p==='..'))throw Error('Invalid local path');
  const base=fs.realpathSync(root),target=path.resolve(base,relative);
@@ -71,25 +62,12 @@ async function control(token,repo,route,method='GET',body){
  }
  return data;
 }
-async function run(env=process.env){
- const event=JSON.parse(fs.readFileSync(env.GITHUB_EVENT_PATH,'utf8')),repo=env.GITHUB_REPOSITORY,owner=repo.split('/')[0];
- if(!['created','edited'].includes(event.action)||event.comment?.user?.type!=='User'||event.comment.user.login.toLowerCase()!==owner.toLowerCase()||event.issue?.pull_request)return {ignored:true};
- const controlToken=env.COMMAND_API_TOKEN,apiToken=controlToken;
- if(!controlToken)throw Error('COMMAND_API_TOKEN is required');
- // Fetch current issue/comment so edited or deleted content never silently substitutes an event.
- const issue=await control(controlToken,repo,'/issues/'+event.issue.number);
- const comment=await control(controlToken,repo,'/issues/comments/'+event.comment.id);
- if(comment.body!==event.comment.body||comment.user?.type!=='User'||comment.user.login.toLowerCase()!==owner.toLowerCase())throw Error('Comment changed or owner authorization changed; submit a new comment');
- if(!/^<!-- command-scope -->\s*\n/.test(comment.body))return {ignored:true};
- const receiptMarker='<!-- github-command-receipt:'+comment.id+':'+crypto.createHash('sha256').update(comment.body).digest('hex')+' -->';
- for(let page=1;;page++){
-  const comments=await control(controlToken,repo,'/issues/'+issue.number+'/comments?per_page=100&page='+page);
-  if(comments.some(c=>c.user?.type==='Bot'&&c.body?.includes(receiptMarker)))return {duplicate:true};
-  if(comments.length<100)break;
- }
- let command,request;
- try{command=parse(comment.body.replace(/^<!-- command-scope -->\s*\n/,''));if(command.command==='help'){if(Object.keys(command).some(k=>!['version','command'].includes(k)))throw Error('help takes no arguments');}else if(command.command==='local/test-stat'){if(command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined||Object.keys(command.parameters||{}).length)throw Error('local/test-stat takes no arguments');}else if(command.command==='local/test-read'){if(command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined||Object.keys(command.parameters||{}).length)throw Error('local/test-read takes no arguments');}else if(command.command==='local/read'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/read accepts only parameters.path');localRead(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}else if(command.command==='local/stat'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/stat accepts only parameters.path');localStat(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}else request=requestFor(command,JSON.parse(fs.readFileSync(path.join(__dirname,'command-catalog.json'),'utf8')),repo);}
- catch(error){await control(controlToken,repo,'/issues/'+issue.number+'/comments','POST',{body:receiptMarker+'\nRejected: '+error.message});return {rejected:true};}
+async function run({command,issue,comment,receiptMarker,token,repo,env=process.env}){
+ if(!command||typeof command.command!=='string'||!issue||!comment||!receiptMarker||!token||!repo)throw Error('Validated command context required');
+ const controlToken=token,apiToken=token;
+ let request;
+ try{if(command.command==='help'){if(Object.keys(command).some(k=>!['version','command'].includes(k)))throw Error('help takes no arguments');}else if(command.command==='local/test-stat'){if(command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined||Object.keys(command.parameters||{}).length)throw Error('local/test-stat takes no arguments');}else if(command.command==='local/test-read'){if(command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined||Object.keys(command.parameters||{}).length)throw Error('local/test-read takes no arguments');}else if(command.command==='local/read'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/read accepts only parameters.path');localRead(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}else if(command.command==='local/stat'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/stat accepts only parameters.path');localStat(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}else request=requestFor(command,JSON.parse(fs.readFileSync(path.join(__dirname,'command-catalog.json'),'utf8')),repo);}
+ catch(error){await control(controlToken,repo,'/issues/'+issue.number+'/comments','POST',{body:receiptMarker+'\\nRejected: '+error.message});return {rejected:true};}
  if(command.command==='help'){
   const docs='https://github.com/'+repo+'/blob/main/ChatMachines/Workflow%20Interactive%20Procedures/GitHub%20Command%20Issue/';
   await control(controlToken,repo,'/issues/'+issue.number+'/comments','POST',{body:receiptMarker+'\nCommand reference (no API request executed):\n\n- [Command catalog]('+docs+'command-catalog.json)\n- [Command JSON schema]('+docs+'user-issue-command.schema.json)\n- [README and usage]('+docs+'README.md)\n\nUse `{\"version\":1,\"command\":\"repos/get\",\"parameters\":{}}` as a normal command example.'});
@@ -110,5 +88,4 @@ async function run(env=process.env){
  }
  if(!result.ok)process.exitCode=1;return result;
 }
-if(require.main===module)run().catch(e=>{console.error(e.message);process.exitCode=1;});
-module.exports={MARKER,parse,requestFor,localStat,localRead,run};
+module.exports={MARKER,requestFor,localStat,localRead,control,run};
