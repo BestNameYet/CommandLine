@@ -68,6 +68,22 @@
     "workspaces/api-to-nodejs/API_MAPPING.md": {
       "description": "Inventory of API calls, local equivalents, remote-only gaps, and validation status.",
       "category": "documentation"
+    },
+    "src/direct-parser.js": {
+      "description": "Validates owner-authored direct execution comments and constructs source, dependency, argument, and return envelopes.",
+      "category": "source"
+    },
+    "src/direct-runner.js": {
+      "description": "Runs direct JavaScript with dependencies inside a temporary Node.js environment and emits a result receipt.",
+      "category": "source"
+    },
+    "workspaces/api-to-nodejs/direct-node-execution.proposed.yml": {
+      "description": "Staged reusable container execution and separate result publication workflow.",
+      "category": "automation"
+    },
+    "workspaces/api-to-nodejs/commandline-issue-direct-job.proposed.yml": {
+      "description": "Staged direct-tag job for incorporation into the main Issue listener workflow.",
+      "category": "automation"
     }
   }
 }
