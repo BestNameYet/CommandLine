@@ -48,6 +48,10 @@
     "src/command-workflow.js": {
       "description": "Workflow coordinator invokes one runner process per ordinal nonce and accumulates each result.",
       "category": "source"
+    },
+    "workspaces/api-to-nodejs/README.md": {
+      "description": "Defines the isolated project scope, acceptance criteria, and constraints for converting GitHub API commands to Node.js execution.",
+      "category": "documentation"
     }
   }
 }
