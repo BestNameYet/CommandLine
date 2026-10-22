@@ -16,6 +16,14 @@
     ".github/workflows/update-manifest.yml": {
       "description": "GitHub Actions workflow that regenerates and commits the repository manifest.",
       "category": "automation"
+    },
+    "src/issue-command.js": {
+      "description": "Imported StateMachines GitHub issue command parser, API executor, and receipt publisher; requires adaptation and its command catalog before deployment.",
+      "category": "source"
+    },
+    "src/render-command.js": {
+      "description": "Imported StateMachines command-result Markdown renderer and chunking utility.",
+      "category": "source"
     }
   }
 }
