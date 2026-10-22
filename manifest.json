@@ -33,7 +33,7 @@
     },
     {
       "path": "src/command-runner.js",
-      "description": "Consumes parser output and executes nonce-grouped commands in ordinal order.",
+      "description": "Executes nonce-ordered commands and returns a result queue to the workflow.",
       "category": "source"
     },
     {
@@ -43,7 +43,12 @@
     },
     {
       "path": "src/issue-command.js",
-      "description": "Executes already-parsed GitHub commands, validates operation arguments, and publishes receipts and rendered results.",
+      "description": "Executes validated commands and returns structured results without publishing.",
+      "category": "source"
+    },
+    {
+      "path": "src/publish-results.js",
+      "description": "Renders queued execution results and publishes comments to the originating issue.",
       "category": "source"
     },
     {
