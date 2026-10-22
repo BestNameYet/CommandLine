@@ -55,3 +55,12 @@ The manifest records the current file inventory, not a history of edits. Git rem
 - Keep reusable tooling in `src/` and configuration in `config/`.
 - Register each new substantive file in the metadata registry before committing.
 - Do not treat workspace staging as permission to alter target files.
+
+## Command processing separation
+
+The intended single-issue command terminal has two distinct stages:
+
+1. `src/command-parser.js` is the upstream entry point. It checks the issue-comment event, authenticates the owner, recognizes the command marker, rejects duplicate receipts, parses the JSON envelope, and calls the executor with a parsed command.
+2. `src/issue-command.js` exports `run({command, issue, comment, receiptMarker, token, repo, env})`. It no longer parses issue-comment text; it validates operation-specific arguments, executes the operation, and publishes receipts/results via `src/render-command.js`.
+
+The copied StateMachines envelope (`version`, `command`, `parameters`, `body`) is temporarily retained. Migration to `command`, `nonce`, `args`, a designated issue number, the command catalog, and an active listener workflow remains pending. These modules are not yet deployed as an operational issue terminal.
