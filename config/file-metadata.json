@@ -84,6 +84,10 @@
     "workspaces/api-to-nodejs/commandline-issue-direct-job.proposed.yml": {
       "description": "Staged direct-tag job for incorporation into the main Issue listener workflow.",
       "category": "automation"
+    },
+    "AGENTS.md": {
+      "description": "Root agent bootstrap instructions: discover the command terminal by exact Issue title through GitHub integration Issue operations, submit commands, and fetch same-comment receipts.",
+      "category": "documentation"
     }
   }
 }
