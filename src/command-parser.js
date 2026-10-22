@@ -36,8 +36,9 @@ async function processEvent(env=process.env){
  const comment=await control(token,repo,'/issues/comments/'+event.comment.id);
  if(comment.body!==event.comment.body||comment.user.login.toLowerCase()!==owner.toLowerCase())throw Error('Comment changed');
  if(!comment.body.startsWith(MARKER+'\n'))return {ignored:true};
+ if(event.action==='edited'&&comment.body.includes('<!-- command-results:start -->'))return {ignored:true};
  let commands;
- try{commands=parse(comment.body.slice(MARKER.length+1));}
+ try{commands=parse(comment.body.slice(MARKER.length+1).split('<!-- command-results:start -->')[0]);}
  catch(error){await control(token,repo,'/issues/'+event.issue.number+'/comments','POST',{body:'Rejected: '+error.message});return {rejected:true};}
  fs.writeFileSync(env.COMMAND_PARSED_OUTPUT||'parsed-commands.json',JSON.stringify({issue:{number:event.issue.number},comment:{id:event.comment.id},commands}));
  return {accepted:true};
