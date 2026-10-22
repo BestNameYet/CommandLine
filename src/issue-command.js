@@ -65,6 +65,10 @@ async function run({command,token,repo,env=process.env}){
  if(!command||typeof command.command!=='string'||!token||!repo)throw Error('Validated command context required');
  let request;
  try{
+  if(command.command==='catalog'){
+   if(command.parameters!==undefined||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('catalog accepts no arguments');
+   return {result:{command:'catalog',ok:true,status:200,execution:'local'},responseText:fs.readFileSync(path.join(__dirname,'command-catalog.json'),'utf8')};
+  }
   if(command.command==='help')return {result:{command:'help',ok:true,status:200},responseText:'Command catalog: src/command-catalog.json'};
   if(command.command==='local/read'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/read accepts only parameters.path');localRead(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}
   else if(command.command==='local/stat'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/stat accepts only parameters.path');localStat(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}
