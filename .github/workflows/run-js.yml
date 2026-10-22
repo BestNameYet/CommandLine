@@ -1,0 +1,41 @@
+name: Run JavaScript Container
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: JavaScript source to execute
+        required: true
+        type: string
+      arguments:
+        description: JSON arguments exposed as JS_ARGUMENTS
+        required: false
+        default: '{}'
+        type: string
+  workflow_call:
+    inputs:
+      source:
+        description: JavaScript source to execute
+        required: true
+        type: string
+      arguments:
+        description: JSON arguments exposed as JS_ARGUMENTS
+        required: false
+        default: '{}'
+        type: string
+
+permissions: {}
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    container:
+      image: node:22-alpine
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Execute JavaScript in container
+        env:
+          JS_SOURCE: ${{ inputs.source }}
+          JS_ARGUMENTS: ${{ inputs.arguments }}
+        run: node runtime/execute-js.cjs
