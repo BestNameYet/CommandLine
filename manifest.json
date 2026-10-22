@@ -2,6 +2,11 @@
   "version": 1,
   "files": [
     {
+      "path": ".github/workflows/commandline-issue.yml",
+      "description": "Routes authorized issue comments through parser and runner.",
+      "category": "automation"
+    },
+    {
       "path": ".github/workflows/update-manifest.yml",
       "description": "GitHub Actions workflow that regenerates and commits the repository manifest.",
       "category": "automation"
@@ -17,8 +22,18 @@
       "category": "configuration"
     },
     {
+      "path": "src/command-catalog.json",
+      "description": "Imported GitHub operation catalog used by command executor.",
+      "category": "configuration"
+    },
+    {
       "path": "src/command-parser.js",
       "description": "Parses owner-authorized issue command comments and passes validated command envelopes to the downstream executor.",
+      "category": "source"
+    },
+    {
+      "path": "src/command-runner.js",
+      "description": "Consumes parser output and executes nonce-grouped commands in ordinal order.",
       "category": "source"
     },
     {
