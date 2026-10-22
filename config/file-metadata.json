@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "files": {
+    "README.md": {
+      "description": "Repository overview, directory layout, metadata rules, and manifest workflow instructions.",
+      "category": "documentation"
+    },
+    "config/file-metadata.json": {
+      "description": "Authoritative repository-relative file descriptions required for manifest generation.",
+      "category": "configuration"
+    },
+    "src/generate-manifest.js": {
+      "description": "Validates descriptive metadata and generates the tracked-file inventory manifest.",
+      "category": "source"
+    },
+    ".github/workflows/update-manifest.yml": {
+      "description": "GitHub Actions workflow that regenerates and commits the repository manifest.",
+      "category": "automation"
+    }
+  }
+}
