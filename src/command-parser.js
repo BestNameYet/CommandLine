@@ -3,21 +3,26 @@ const fs=require('node:fs');
 const {control,MARKER}=require('./issue-command.js');
 function parse(body){
  const statement=JSON.parse(body.trim());
- if(!statement||Array.isArray(statement)||!Array.isArray(statement.ordinal)||!Array.isArray(statement.statements))throw Error('Expected ordinal and statements arrays');
- const {ordinal,statements}=statement;
- if(!ordinal.length||new Set(ordinal).size!==ordinal.length||ordinal.some(n=>typeof n!=='string'||!n))throw Error('Invalid ordinal');
- const grouped=new Map(ordinal.map(n=>[n,{}]));
- for(const item of statements){
-  if(!item||Object.keys(item).sort().join(',')!=='k,nonce,v'||typeof item.k!=='string'||!grouped.has(item.nonce))throw Error('Invalid k/v/nonce entry');
+ if(!statement||Array.isArray(statement)||typeof statement!=='object'||!Array.isArray(statement.statements)||!statement.statements.length)throw Error('Expected nonempty statements array');
+ const ordinal=statement.ordinal===undefined?[]:statement.ordinal;
+ if(!Array.isArray(ordinal)||new Set(ordinal).size!==ordinal.length||ordinal.some(n=>typeof n!=='string'||!n))throw Error('Invalid ordinal override');
+ const grouped=new Map();
+ for(const item of statement.statements){
+  if(!item||Array.isArray(item)||Object.keys(item).sort().join(',')!=='k,nonce,v'||typeof item.k!=='string'||!item.k||typeof item.nonce!=='string'||!item.nonce)throw Error('Invalid k/v/nonce entry');
+  if(!grouped.has(item.nonce))grouped.set(item.nonce,{});
   const group=grouped.get(item.nonce);
   if(Object.hasOwn(group,item.k))throw Error('Duplicate key');
   if(!['command','version','parameters','body','body_base64','headers'].includes(item.k))throw Error('Unsupported key');
   group[item.k]=item.v;
  }
- return ordinal.map(nonce=>{
+ for(const nonce of ordinal)if(!grouped.has(nonce))throw Error('Ordinal references unknown nonce');
+ const order=[...ordinal,...Array.from(grouped.keys()).filter(n=>!ordinal.includes(n))];
+ return order.map(nonce=>{
   const command=grouped.get(nonce);
   if(typeof command.command!=='string'||!command.command)throw Error('Missing command');
   if(command.version!==undefined&&command.version!==1)throw Error('Unsupported version');
+  if(command.parameters!==undefined&&(!command.parameters||typeof command.parameters!=='object'||Array.isArray(command.parameters)))throw Error('Invalid parameters');
+  if(command.headers!==undefined&&(!command.headers||typeof command.headers!=='object'||Array.isArray(command.headers)))throw Error('Invalid headers');
   return {nonce,command:{version:1,...command}};
  });
 }
