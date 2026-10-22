@@ -60,12 +60,19 @@
       "path": "src/render-command.js",
       "description": "Imported StateMachines command-result Markdown renderer and chunking utility.",
       "category": "source"
+    },
+    {
+      "path": "workspaces/api-to-nodejs/README.md",
+      "description": "Defines the isolated project scope, acceptance criteria, and constraints for converting GitHub API commands to Node.js execution.",
+      "category": "documentation"
     }
   ],
   "directories": [
     ".github/",
     ".github/workflows/",
     "config/",
-    "src/"
+    "src/",
+    "workspaces/",
+    "workspaces/api-to-nodejs/"
   ]
 }
