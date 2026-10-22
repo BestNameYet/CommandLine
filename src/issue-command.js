@@ -1,7 +1,6 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const MARKER='<!-- github-command-surface:v1 -->';
-const {renderCommandResult}=require('./render-command.js');
 function localStat(root,relative){
  if(typeof relative!=='string'||!relative||path.isAbsolute(relative)||relative.split(/[\\/]/).some(p=>!p||p==='.'||p==='..'))throw Error('Invalid local path');
  const base=fs.realpathSync(root),target=path.resolve(base,relative);
@@ -62,30 +61,21 @@ async function control(token,repo,route,method='GET',body){
  }
  return data;
 }
-async function run({command,issue,comment,receiptMarker,token,repo,env=process.env}){
- if(!command||typeof command.command!=='string'||!issue||!comment||!receiptMarker||!token||!repo)throw Error('Validated command context required');
- const controlToken=token,apiToken=token;
+async function run({command,token,repo,env=process.env}){
+ if(!command||typeof command.command!=='string'||!token||!repo)throw Error('Validated command context required');
  let request;
- try{if(command.command==='help'){if(Object.keys(command).some(k=>!['version','command'].includes(k)))throw Error('help takes no arguments');}else if(command.command==='local/test-stat'){if(command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined||Object.keys(command.parameters||{}).length)throw Error('local/test-stat takes no arguments');}else if(command.command==='local/test-read'){if(command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined||Object.keys(command.parameters||{}).length)throw Error('local/test-read takes no arguments');}else if(command.command==='local/read'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/read accepts only parameters.path');localRead(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}else if(command.command==='local/stat'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/stat accepts only parameters.path');localStat(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}else request=requestFor(command,JSON.parse(fs.readFileSync(path.join(__dirname,'command-catalog.json'),'utf8')),repo);}
- catch(error){await control(controlToken,repo,'/issues/'+issue.number+'/comments','POST',{body:receiptMarker+'\nRejected: '+error.message});return {rejected:true};}
- if(command.command==='help'){
-  const docs='https://github.com/'+repo+'/blob/main/ChatMachines/Workflow%20Interactive%20Procedures/GitHub%20Command%20Issue/';
-  await control(controlToken,repo,'/issues/'+issue.number+'/comments','POST',{body:receiptMarker+'\nCommand reference (no API request executed):\n\n- [Command catalog]('+docs+'command-catalog.json)\n- [Command JSON schema]('+docs+'user-issue-command.schema.json)\n- [README and usage]('+docs+'README.md)\n\nUse `{\"version\":1,\"command\":\"repos/get\",\"parameters\":{}}` as a normal command example.'});
-  return {help:true};
- }
- const receipt=await control(controlToken,repo,'/issues/'+issue.number+'/comments','POST',{body:receiptMarker+'\nExecuting `'+command.command+'`.'});
- let result, responseText='';
  try{
-  // Execute the requested GitHub operation, not a simulated request.
-  if(command.command==='local/test-stat'){const stream=require('node:test').run({files:[path.join(__dirname,'local-stat.test.js')]});let passed=0,failed=0;const failures=[];for await(const event of stream){if(event.type==='test:pass')passed++;if(event.type==='test:fail'){failed++;failures.push(String(event.data?.details?.error?.message||event.data?.name||'test failed'));}}responseText=JSON.stringify({passed,failed,failures});result={command:command.command,status:failed?500:200,ok:failed===0,execution:'local'};}else if(command.command==='local/test-read'){const stream=require('node:test').run({files:[path.join(__dirname,'local-read.test.js')]});let passed=0,failed=0;const failures=[];for await(const event of stream){if(event.type==='test:pass')passed++;if(event.type==='test:fail'){failed++;failures.push(String(event.data?.details?.error?.message||event.data?.name||'test failed'));}}responseText=JSON.stringify({passed,failed,failures});result={command:command.command,status:failed?500:200,ok:failed===0,execution:'local'};}else if(command.command==='local/read'){responseText=JSON.stringify(localRead(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path));result={command:command.command,status:200,ok:true,execution:'local'};}else if(command.command==='local/stat'){responseText=JSON.stringify(localStat(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path));result={command:command.command,status:200,ok:true,execution:'local'};}else{const r=await call(apiToken,request.url,request);responseText=await r.text();result={command:command.command,status:r.status,ok:r.ok};if(!r.ok)result.error=responseText||r.statusText||'GitHub API request failed';}
- }catch(error){result={command:command.command,ok:false,outcome:'unknown',error:error.message};}
- const summary=result.ok?'Executed `'+command.command+'` (HTTP '+result.status+').':'Failed `'+command.command+'`'+(result.status?' (HTTP '+result.status+')':'')+': '+(result.error||'Unknown outcome');
- await control(controlToken,repo,'/issues/comments/'+receipt.id,'PATCH',{body:receiptMarker+'\n'+summary});
- // Render command output using the adapted AGENTS issue renderer, targeting the event issue.
- const renderedParts=renderCommandResult({issueNumber:issue.number,commentId:comment.id,marker:receiptMarker,command,result,responseText:responseText||result.error||''});
- for(const body of renderedParts){
-  await control(controlToken,repo,'/issues/'+issue.number+'/comments','POST',{body});
- }
- if(!result.ok)process.exitCode=1;return result;
+  if(command.command==='help')return {result:{command:'help',ok:true,status:200},responseText:'Command catalog: src/command-catalog.json'};
+  if(command.command==='local/read'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/read accepts only parameters.path');localRead(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}
+  else if(command.command==='local/stat'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/stat accepts only parameters.path');localStat(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}
+  else request=requestFor(command,JSON.parse(fs.readFileSync(path.join(__dirname,'command-catalog.json'),'utf8')),repo);
+ }catch(error){return {result:{command:command.command,ok:false,rejected:true,error:error.message},responseText:error.message};}
+ try{
+  let responseText='',result;
+  if(command.command==='local/read'){responseText=JSON.stringify(localRead(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path));result={command:command.command,ok:true,status:200,execution:'local'};}
+  else if(command.command==='local/stat'){responseText=JSON.stringify(localStat(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path));result={command:command.command,ok:true,status:200,execution:'local'};}
+  else{const response=await call(token,request.url,request);responseText=await response.text();result={command:command.command,ok:response.ok,status:response.status};if(!response.ok)result.error=responseText||response.statusText;}
+  return {result,responseText};
+ }catch(error){return {result:{command:command.command,ok:false,outcome:'unknown',error:error.message},responseText:error.message};}
 }
 module.exports={MARKER,requestFor,localStat,localRead,control,run};
