@@ -20,16 +20,22 @@
       "path": "src/generate-manifest.js",
       "description": "Validates descriptive metadata and generates the tracked-file inventory manifest.",
       "category": "source"
+    },
+    {
+      "path": "src/issue-command.js",
+      "description": "Imported StateMachines GitHub issue command parser, API executor, and receipt publisher; requires adaptation and its command catalog before deployment.",
+      "category": "source"
+    },
+    {
+      "path": "src/render-command.js",
+      "description": "Imported StateMachines command-result Markdown renderer and chunking utility.",
+      "category": "source"
     }
   ],
   "directories": [
     ".github/",
     ".github/workflows/",
     "config/",
-    "docs/",
-    "runtime/",
-    "src/",
-    "tests/",
-    "workspaces/"
+    "src/"
   ]
 }
