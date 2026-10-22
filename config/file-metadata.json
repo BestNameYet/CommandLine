@@ -56,6 +56,18 @@
     "workspaces/api-to-nodejs/PROJECT_INSTRUCTIONS.md": {
       "description": "Project-specific agent instructions covering the GitHub Issues command terminal, command discovery, workspace isolation, and Node.js conversion workflow.",
       "category": "documentation"
+    },
+    "workspaces/api-to-nodejs/local-repository-adapter.js": {
+      "description": "Workspace-only Node.js filesystem/Git adapter for safe repository content and README reads.",
+      "category": "source"
+    },
+    "workspaces/api-to-nodejs/local-repository-adapter.test.js": {
+      "description": "Node.js fixture tests for local content mapping and rejection cases.",
+      "category": "test"
+    },
+    "workspaces/api-to-nodejs/API_MAPPING.md": {
+      "description": "Inventory of API calls, local equivalents, remote-only gaps, and validation status.",
+      "category": "documentation"
     }
   }
 }
