@@ -33,7 +33,12 @@
     },
     {
       "path": "src/command-runner.js",
-      "description": "Executes nonce-ordered commands and returns a result queue to the workflow.",
+      "description": "Executes exactly one selected command and writes one result before terminating.",
+      "category": "source"
+    },
+    {
+      "path": "src/command-workflow.js",
+      "description": "Workflow coordinator invokes one runner process per ordinal nonce and accumulates each result.",
       "category": "source"
     },
     {
