@@ -21,7 +21,7 @@ async function processEvent(env=process.env){
  const issue=await control(token,repo,'/issues/'+event.issue.number);
  const comment=await control(token,repo,'/issues/comments/'+event.comment.id);
  if(comment.body!==event.comment.body||comment.user?.type!=='User'||comment.user.login.toLowerCase()!==owner.toLowerCase())throw Error('Comment changed or owner authorization changed; submit a new comment');
- if(!/^<!-- command-scope -->\\s*\\n/.test(comment.body))return {ignored:true};
+ if(!/^<!-- command-scope -->\s*\n/.test(comment.body))return {ignored:true};
  const receiptMarker='<!-- github-command-receipt:'+comment.id+':'+crypto.createHash('sha256').update(comment.body).digest('hex')+' -->';
  for(let page=1;;page++){
   const comments=await control(token,repo,'/issues/'+issue.number+'/comments?per_page=100&page='+page);
@@ -29,8 +29,8 @@ async function processEvent(env=process.env){
   if(comments.length<100)break;
  }
  let command;
- try{command=parse(comment.body.replace(/^<!-- command-scope -->\\s*\\n/,''));}
- catch(error){await control(token,repo,'/issues/'+issue.number+'/comments','POST',{body:receiptMarker+'\\nRejected: '+error.message});return {rejected:true};}
+ try{command=parse(comment.body.replace(/^<!-- command-scope -->\s*\n/,''));}
+ catch(error){await control(token,repo,'/issues/'+issue.number+'/comments','POST',{body:receiptMarker+'\nRejected: '+error.message});return {rejected:true};}
  return run({command,issue,comment,receiptMarker,token,repo,env});
 }
 if(require.main===module)processEvent().catch(e=>{console.error(e.message);process.exitCode=1;});
