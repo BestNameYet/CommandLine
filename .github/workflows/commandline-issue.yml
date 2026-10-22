@@ -1,0 +1,33 @@
+name: CommandLine Issue Terminal
+on:
+  issue_comment:
+    types: [created, edited]
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: commandline-terminal
+  cancel-in-progress: false
+jobs:
+  command:
+    if: github.event.issue.pull_request == null && github.event.comment.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Parse issue comment into structured commands
+        env:
+          COMMAND_API_TOKEN: ${{ secrets.COMMAND_API_TOKEN }}
+          COMMAND_ISSUE_NUMBER: ${{ vars.COMMAND_ISSUE_NUMBER }}
+          COMMAND_PARSED_OUTPUT: ${{ runner.temp }}/parsed-commands.json
+        run: node src/command-parser.js
+      - name: Execute parsed commands in ordinal order
+        env:
+          COMMAND_API_TOKEN: ${{ secrets.COMMAND_API_TOKEN }}
+          COMMAND_PARSED_OUTPUT: ${{ runner.temp }}/parsed-commands.json
+        run: |
+          if [ -f "$COMMAND_PARSED_OUTPUT" ]; then
+            node src/command-runner.js
+          fi
