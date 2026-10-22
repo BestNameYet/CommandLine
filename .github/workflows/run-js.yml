@@ -7,27 +7,56 @@ on:
         required: true
         type: string
       arguments:
-        description: JSON arguments exposed as JS_ARGUMENTS
+        description: JSON arguments
         required: false
         default: '{}'
+        type: string
+      dependencies:
+        description: JSON array of pinned npm package versions
+        required: false
+        default: '[]'
+        type: string
+      environment_json:
+        description: JSON object of additional string environment variables
+        required: false
+        default: '{}'
+        type: string
+      timeout_ms:
+        description: Execution timeout in milliseconds (1000-1200000)
+        required: false
+        default: '60000'
+        type: string
+      output_limit_bytes:
+        description: Maximum stdout/stderr buffer bytes (1024-10485760)
+        required: false
+        default: '1048576'
         type: string
   workflow_call:
     inputs:
       source:
-        description: JavaScript source to execute
+        type: string
         required: true
-        type: string
       arguments:
-        description: JSON arguments exposed as JS_ARGUMENTS
-        required: false
-        default: '{}'
         type: string
+        default: '{}'
+      dependencies:
+        type: string
+        default: '[]'
+      environment_json:
+        type: string
+        default: '{}'
+      timeout_ms:
+        type: string
+        default: '60000'
+      output_limit_bytes:
+        type: string
+        default: '1048576'
 
 permissions: {}
 jobs:
   execute:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 25
     container:
       image: node:22-alpine
     steps:
@@ -38,4 +67,8 @@ jobs:
         env:
           JS_SOURCE: ${{ inputs.source }}
           JS_ARGUMENTS: ${{ inputs.arguments }}
+          JS_DEPENDENCIES: ${{ inputs.dependencies }}
+          JS_ENV_JSON: ${{ inputs.environment_json }}
+          JS_TIMEOUT_MS: ${{ inputs.timeout_ms }}
+          JS_OUTPUT_LIMIT_BYTES: ${{ inputs.output_limit_bytes }}
         run: node runtime/execute-js.cjs
