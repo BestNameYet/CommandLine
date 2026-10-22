@@ -28,6 +28,14 @@
     "src/command-parser.js": {
       "description": "Parses owner-authorized issue command comments and passes validated command envelopes to the downstream executor.",
       "category": "source"
+    },
+    "src/command-runner.js": {
+      "description": "Consumes parser output and executes nonce-grouped commands in ordinal order.",
+      "category": "source"
+    },
+    ".github/workflows/commandline-issue.yml": {
+      "description": "Routes authorized issue comments through parser and runner.",
+      "category": "automation"
     }
   }
 }
