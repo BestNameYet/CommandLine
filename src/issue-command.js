@@ -69,6 +69,14 @@ async function run({command,token,repo,env=process.env}){
    if(command.parameters!==undefined||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('catalog accepts no arguments');
    return {result:{command:'catalog',ok:true,status:200,execution:'local'},responseText:fs.readFileSync(path.join(__dirname,'command-catalog.json'),'utf8')};
   }
+  if(command.command==='issues/delete-comment'){
+   const p=command.parameters;
+   if(!p||Object.keys(p).length!==2||!Number.isSafeInteger(p.comment_id)||p.comment_id<1||p.issue_number!==1||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('issues/delete-comment requires parameters.comment_id (positive integer) and issue_number: 1 only');
+   const comment=await control(token,repo,'/issues/comments/'+p.comment_id);
+   if(comment.issue_url!=='https://api.github.com/repos/'+repo+'/issues/1')throw Error('Comment does not belong to authorized Issue #1');
+   await control(token,repo,'/issues/comments/'+p.comment_id,'DELETE');
+   return {result:{command:'issues/delete-comment',ok:true,status:204,deletedCommentId:p.comment_id},responseText:JSON.stringify({deletedCommentId:p.comment_id,verifiedIssue:1})};
+  }
   if(command.command==='help')return {result:{command:'help',ok:true,status:200},responseText:'Command catalog: src/command-catalog.json'};
   if(command.command==='local/read'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/read accepts only parameters.path');localRead(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}
   else if(command.command==='local/stat'){if(!command.parameters||Object.keys(command.parameters).some(k=>k!=='path')||command.body!==undefined||command.body_base64!==undefined||command.headers!==undefined)throw Error('local/stat accepts only parameters.path');localStat(env.GITHUB_WORKSPACE||process.cwd(),command.parameters.path);}
