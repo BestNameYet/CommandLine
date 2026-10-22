@@ -22,11 +22,11 @@
       "category": "source"
     },
     "src/render-command.js": {
-      "description": "Imported StateMachines command-result Markdown renderer and chunking utility.",
+      "description": "Renders local file contents and compact GitHub commit receipts (SHA and verified flag), suppressing raw API response JSON.",
       "category": "source"
     },
     "src/command-parser.js": {
-      "description": "Parses owner-authored command comments and ignores edits containing appended results to prevent execution loops.",
+      "description": "Parses commands, appends UTF-8 decoded source previews to original comments at submission, and avoids edit-triggered replay.",
       "category": "source"
     },
     "src/command-runner.js": {
