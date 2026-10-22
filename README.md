@@ -56,11 +56,18 @@ The manifest records the current file inventory, not a history of edits. Git rem
 - Register each new substantive file in the metadata registry before committing.
 - Do not treat workspace staging as permission to alter target files.
 
-## Command processing separation
+## Command pipeline
 
-The intended single-issue command terminal has two distinct stages:
+Issue comments prefixed with `<!-- github-command-surface:v1 -->` carry a JSON object containing `ordinal` (ordered unique nonces) and `statements` (flat `{k,v,nonce}` objects). The parser groups fields by nonce and writes structured commands. The workflow passes these to the runner, which executes in ordinal order and writes a result queue. A separate workflow step formats and publishes the queued results.
 
-1. `src/command-parser.js` is the upstream entry point. It checks the issue-comment event, authenticates the owner, recognizes the command marker, rejects duplicate receipts, parses the JSON envelope, and calls the executor with a parsed command.
-2. `src/issue-command.js` exports `run({command, issue, comment, receiptMarker, token, repo, env})`. It no longer parses issue-comment text; it validates operation-specific arguments, executes the operation, and publishes receipts/results via `src/render-command.js`.
+## Configurable result rendering
 
-The copied StateMachines envelope (`version`, `command`, `parameters`, `body`) is temporarily retained. Migration to `command`, `nonce`, `args`, a designated issue number, the command catalog, and an active listener workflow remains pending. These modules are not yet deployed as an operational issue terminal.
+The workflow controls rendering independently of execution using repository variables:
+
+| Variable | Values | Default |
+| --- | --- | --- |
+| `COMMAND_OUTPUT_FORMAT` | `markdown`, `json`, `text` | `markdown` |
+| `COMMAND_OUTPUT_DESTINATION` | `issue`, `file`, `stdout` | `issue` |
+| `COMMAND_OUTPUT_ISSUE` | Positive issue number (when destination is `issue`) | Originating issue |
+
+For `file`, the workflow writes to its temporary directory at `command-output.txt`; it is not automatically uploaded as an artifact. For `stdout`, the output is written to workflow logs. Destination settings are supplied by workflow configuration, not untrusted issue comments. The `COMMAND_API_TOKEN` secret and `COMMAND_ISSUE_NUMBER` variable are required for the intended terminal deployment. The workflow has not yet been verified end to end.
