@@ -8,16 +8,12 @@ async function main(env=process.env){
  if(!token||!repo||!Array.isArray(payload.commands)||!Number.isSafeInteger(index)||index<0||index>=payload.commands.length)throw Error('One valid COMMAND_INDEX and runner context required');
  const {nonce,command}=payload.commands[index];
  const marker='<!-- command-nonce:'+crypto.createHash('sha256').update(repo+':'+nonce).digest('hex')+' -->';
- let previous=null;
- for(let page=1;;page++){
-  const comments=await control(token,repo,'/issues/'+payload.issue.number+'/comments?per_page=100&page='+page);
-  previous=comments.find(c=>c.body?.includes(marker));
-  if(previous||comments.length<100)break;
- }
+ const source=await control(token,repo,'/issues/comments/'+payload.comment.id);
+ if(source.issue_url!=='https://api.github.com/repos/'+repo+'/issues/'+payload.issue.number)throw Error('Source comment mismatch');
+ const previous=source.body.includes(marker);
  let entry;
- if(previous)entry={nonce,marker,command,result:{command:command.command,ok:null,skipped:true},responseText:'Nonce already claimed; command not replayed.'};
+ if(previous)entry={nonce,marker,command,result:{command:command.command,ok:null,skipped:true},responseText:'Nonce already rendered on the source comment; command not replayed.'};
  else{
-  await control(token,repo,'/issues/'+payload.issue.number+'/comments','POST',{body:marker+'\nNonce claimed; result pending.'});
   const execution=await run({command,token,repo,env});
   entry={nonce,marker,command,...execution};
  }
