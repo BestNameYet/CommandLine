@@ -31,6 +31,11 @@ on:
         required: false
         default: ''
         type: string
+      job_timeout_minutes:
+        description: GitHub Actions job timeout in minutes
+        required: false
+        default: '360'
+        type: string
       config_file:
         description: Executor configuration file
         required: false
@@ -61,6 +66,9 @@ on:
       output_limit_bytes:
         type: string
         default: ''
+      job_timeout_minutes:
+        type: string
+        default: '360'
       config_file:
         type: string
         default: config/js-executor.json
@@ -72,7 +80,7 @@ permissions: {}
 jobs:
   execute:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: ${{ fromJSON(inputs.job_timeout_minutes) }}
     container:
       image: node:22-alpine
     steps:
