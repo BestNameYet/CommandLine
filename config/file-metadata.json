@@ -26,11 +26,11 @@
       "category": "source"
     },
     "src/command-parser.js": {
-      "description": "Parses owner-authorized issue command comments and passes validated command envelopes to the downstream executor.",
+      "description": "Parses owner-authored command comments and ignores edits containing appended results to prevent execution loops.",
       "category": "source"
     },
     "src/command-runner.js": {
-      "description": "Executes exactly one selected command and writes one result before terminating.",
+      "description": "Executes one source-comment command and checks its nonce marker in that same comment to prevent replay without creating claim comments.",
       "category": "source"
     },
     ".github/workflows/commandline-issue.yml": {
@@ -42,7 +42,7 @@
       "category": "configuration"
     },
     "src/publish-results.js": {
-      "description": "Renders queued execution results and publishes comments to the originating issue.",
+      "description": "Queues and renders command results, appending them to the originating issue comment by PATCH instead of creating response comments.",
       "category": "source"
     },
     "src/command-workflow.js": {
