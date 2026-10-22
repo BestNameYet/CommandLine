@@ -33,6 +33,18 @@ function render(queue,format){
   command:entry.command,result:entry.result,responseText:entry.responseText
  }));
 }
+function appendResult(env=process.env){
+ const payload=JSON.parse(fs.readFileSync(env.COMMAND_PARSED_OUTPUT,'utf8'));
+ const entry=JSON.parse(fs.readFileSync(env.COMMAND_SINGLE_RESULT,'utf8'));
+ const file=env.COMMAND_RESULT_QUEUE;
+ if(!file)throw Error('Publisher queue path required');
+ const queue=fs.existsSync(file)?JSON.parse(fs.readFileSync(file,'utf8')):{issue:payload.issue,comment:payload.comment,results:[]};
+ if(!Array.isArray(queue.results))throw Error('Invalid publisher queue');
+ if(queue.results.some(r=>r.nonce===entry.nonce))throw Error('Duplicate queued nonce');
+ queue.results.push(entry);
+ fs.writeFileSync(file,JSON.stringify(queue));
+ return entry;
+}
 async function main(env=process.env){
  const queue=JSON.parse(fs.readFileSync(env.COMMAND_RESULT_QUEUE||'result-queue.json','utf8'));
  if(!Array.isArray(queue.results))throw Error('Missing result queue');
@@ -46,5 +58,5 @@ async function main(env=process.env){
  if(!token||!repo)throw Error('Missing issue publication credentials');
  for(const part of parts)await control(token,repo,'/issues/'+config.issueNumber+'/comments','POST',{body:part});
 }
-if(require.main===module)main().catch(e=>{console.error(e);process.exitCode=1;});
-module.exports={main,policy,render};
+if(require.main===module){if(process.argv[2]==='append'){try{appendResult();}catch(e){console.error(e);process.exitCode=1;}}else main().catch(e=>{console.error(e);process.exitCode=1;});}
+module.exports={main,policy,render,appendResult};
