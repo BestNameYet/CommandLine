@@ -23,15 +23,15 @@ jobs:
           COMMAND_ISSUE_NUMBER: ${{ vars.COMMAND_ISSUE_NUMBER }}
           COMMAND_PARSED_OUTPUT: ${{ runner.temp }}/parsed-commands.json
         run: node src/command-parser.js
-      - name: Execute parsed commands in ordinal order
+      - name: Execute commands one at a time
         env:
           COMMAND_API_TOKEN: ${{ secrets.COMMAND_API_TOKEN }}
           COMMAND_PARSED_OUTPUT: ${{ runner.temp }}/parsed-commands.json
           COMMAND_RESULT_QUEUE: ${{ runner.temp }}/result-queue.json
+          COMMAND_SINGLE_RESULT: ${{ runner.temp }}/single-result.json
         run: |
-          if [ -f "$COMMAND_PARSED_OUTPUT" ]; then
-            node src/command-runner.js
-          fi
+          if [ ! -f "$COMMAND_PARSED_OUTPUT" ]; then exit 0; fi
+          node src/command-workflow.js
       - name: Render and publish queued results
         if: always()
         env:
