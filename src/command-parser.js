@@ -36,7 +36,7 @@ async function processEvent(env=process.env){
  const comment=await control(token,repo,'/issues/comments/'+event.comment.id);
  if(comment.body!==event.comment.body||comment.user.login.toLowerCase()!==owner.toLowerCase())throw Error('Comment changed');
  if(!comment.body.startsWith(MARKER+'\n'))return {ignored:true};
- if(event.action==='edited'&&comment.body.includes('<!-- command-results:start -->'))return {ignored:true};
+ if(event.action==='edited'&&(comment.body.includes('<!-- command-results:start -->')||comment.body.includes('<!-- command-source-preview:start -->')))return {ignored:true};
  let commands;
  try{commands=parse(comment.body.slice(MARKER.length+1).split('<!-- command-results:start -->')[0]);}
  catch(error){await control(token,repo,'/issues/'+event.issue.number+'/comments','POST',{body:'Rejected: '+error.message});return {rejected:true};}
@@ -47,10 +47,10 @@ async function processEvent(env=process.env){
    if(typeof encoded!=='string'||!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(encoded))continue;
    const bytes=Buffer.from(encoded,'base64'),decoded=bytes.toString('utf8');
    if(!bytes.equals(Buffer.from(decoded,'utf8'))){views.push('Nonce '+nonce+': binary payload not UTF-8; cannot render as text');continue;}
-   const fence=String.fromCharCode(96).repeat(Math.max(3,...(decoded.match(/\\`+/g)||[]).map(s=>s.length+1)));
-   views.push('#### '+String(command.parameters?.path||nonce)+'\\n\\n'+fence+'text\\n'+decoded+'\\n'+fence);
+   const fence=String.fromCharCode(96).repeat(Math.max(3,...(decoded.match(/`+/g)||[]).map(s=>s.length+1)));
+   views.push('#### '+String(command.parameters?.path||nonce)+'\n\n'+fence+'text\n'+decoded+'\n'+fence);
   }
-  if(views.length)await control(token,repo,'/issues/comments/'+event.comment.id,'PATCH',{body:comment.body+'\\n\\n<!-- command-source-preview:start -->\\n\\n### Submitted file contents (decoded)\\n\\n'+views.join('\\n\\n')});
+  if(views.length)await control(token,repo,'/issues/comments/'+event.comment.id,'PATCH',{body:comment.body+'\n\n<!-- command-source-preview:start -->\n\n### Submitted file contents (decoded)\n\n'+views.join('\n\n')});
  }
  fs.writeFileSync(env.COMMAND_PARSED_OUTPUT||'parsed-commands.json',JSON.stringify({issue:{number:event.issue.number},comment:{id:event.comment.id},commands}));
  return {accepted:true};
