@@ -62,6 +62,11 @@
       "category": "source"
     },
     {
+      "path": "workspaces/api-to-nodejs/PROJECT_INSTRUCTIONS.md",
+      "description": "Project-specific agent instructions covering the GitHub Issues command terminal, command discovery, workspace isolation, and Node.js conversion workflow.",
+      "category": "documentation"
+    },
+    {
       "path": "workspaces/api-to-nodejs/README.md",
       "description": "Defines the isolated project scope, acceptance criteria, and constraints for converting GitHub API commands to Node.js execution.",
       "category": "documentation"
