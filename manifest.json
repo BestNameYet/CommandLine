@@ -17,13 +17,18 @@
       "category": "configuration"
     },
     {
+      "path": "src/command-parser.js",
+      "description": "Parses owner-authorized issue command comments and passes validated command envelopes to the downstream executor.",
+      "category": "source"
+    },
+    {
       "path": "src/generate-manifest.js",
       "description": "Validates descriptive metadata and generates the tracked-file inventory manifest.",
       "category": "source"
     },
     {
       "path": "src/issue-command.js",
-      "description": "Imported StateMachines GitHub issue command parser, API executor, and receipt publisher; requires adaptation and its command catalog before deployment.",
+      "description": "Executes already-parsed GitHub commands, validates operation arguments, and publishes receipts and rendered results.",
       "category": "source"
     },
     {
