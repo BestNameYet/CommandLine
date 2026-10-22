@@ -58,7 +58,7 @@ The manifest records the current file inventory, not a history of edits. Git rem
 
 ## Command pipeline
 
-Issue comments prefixed with `<!-- github-command-surface:v1 -->` carry a JSON object containing `ordinal` (ordered unique nonces) and `statements` (flat `{k,v,nonce}` objects). The parser groups fields by nonce and writes structured commands. The workflow invokes `src/command-workflow.js` to iterate through ordinal commands. It launches `src/command-runner.js` once per command; each runner process writes exactly one structured result and terminates. The workflow coordinator appends that result to its queue before starting the next runner. A separate workflow step formats and publishes the queued results.
+Issue comments prefixed with `<!-- github-command-surface:v1 -->` carry a JSON object containing `ordinal` (ordered unique nonces) and `statements` (flat `{k,v,nonce}` objects). The parser groups fields by nonce and writes structured commands. The workflow invokes `src/command-workflow.js` to iterate through ordinal commands. It launches `src/command-runner.js` once per command; each runner process writes exactly one structured result and terminates. The workflow coordinator forwards each runner result to `src/publish-results.js append`, which exclusively owns and persists the result queue. A separate workflow step invokes the publisher to render and deliver the accumulated results.
 
 ## Configurable result rendering
 
