@@ -3,7 +3,7 @@
   "files": [
     {
       "path": ".github/workflows/commandline-issue.yml",
-      "description": "Routes authorized issue comments through parser and runner.",
+      "description": "Routes authorized issue comments through parser and runner, with a fallback GitHub token and repository content/issue permissions.",
       "category": "automation"
     },
     {
@@ -48,7 +48,7 @@
     },
     {
       "path": "src/issue-command.js",
-      "description": "Executes validated commands and returns structured results without publishing.",
+      "description": "Executes validated commands, supports zero-argument local catalog retrieval, and returns structured results without publishing.",
       "category": "source"
     },
     {
