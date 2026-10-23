@@ -16,14 +16,6 @@ async function api(path, options = {}) {
   if (!response.ok) throw new Error(`GitHub API ${response.status}: ${await response.text()}`);
   return response.status === 204 ? null : response.json();
 }
-function describe(body) {
-  try {
-    const entry = JSON.parse(body);
-    const summary = entry.description ?? entry.fileName ?? entry.path ?? entry.command ?? entry.type;
-    if (typeof summary === 'string' && summary.trim()) return summary.trim();
-  } catch {}
-  return body.trim().split(/\r?\n/).find(Boolean)?.slice(0, 160) || '(empty)';
-}
 function fence(body) {
   const runs = body.match(/`+/g) ?? [];
   const longest = Math.max(2, ...runs.map(s => s.length));
@@ -48,7 +40,6 @@ async function main() {
   ];
   for (const comment of comments) {
     lines.push(`### [Comment ${comment.id}](${comment.html_url})`);
-    lines.push(`**Description:** ${describe(comment.body).replace(/\r?\n/g,' ')}`);
     lines.push('**Content:**');
     lines.push(fence(comment.body));
     lines.push('');
