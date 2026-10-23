@@ -77,7 +77,8 @@ function manifestEntry(comment, issueNumber) {
   if (issueNumber === 4) {
     const descriptions = {
       'create.cjs': 'Create a file on a configured Git working branch.',
-      'read.cjs': 'Read a file or directory from a configured Git branch.'
+      'read.cjs': 'Read a file or directory from a configured Git branch.',
+      'commit.cjs': 'Commit the file referenced by an Issue #5 comment to the configured working branch.'
     };
     return {
       commentId: comment.id,
