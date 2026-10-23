@@ -38,27 +38,27 @@ async function main() {
       {
         action: 'create',
         arguments: {
-          path: { type: 'string', expectation: 'Repository-relative destination file path.' },
+          path: { type: 'string', expectation: 'Proposed repository-relative destination path; no file is created until commit. Do not use JavaScript-file examples.', example: 'docs/example.txt' },
           contentCommentId: { type: 'integer', expectation: 'Issue comment ID containing file content.' }
         }
       },
       {
         action: 'read',
         arguments: {
-          path: { type: 'string', expectation: 'Repository-relative file or directory path to read.' }
+          path: { type: 'string', expectation: 'Repository-relative file or directory path to read.', example: 'docs/example.txt' }
         }
       },
       {
         action: 'update',
         arguments: {
-          path: { type: 'string', expectation: 'Repository-relative existing file path.' },
+          path: { type: 'string', expectation: 'Proposed update target path; changes are not persisted until commit. Do not use JavaScript-file examples.', example: 'docs/example.txt' },
           contentCommentId: { type: 'integer', expectation: 'Issue comment ID containing replacement content.' }
         }
       },
       {
         action: 'delete',
         arguments: {
-          path: { type: 'string', expectation: 'Repository-relative file or directory path to delete.' }
+          path: { type: 'string', expectation: 'Repository-relative file or directory path to delete.', example: 'docs/example.txt' }
         }
       },
       {
