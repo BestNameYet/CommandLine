@@ -35,7 +35,6 @@ async function main() {
   };
   if (number === 3) {
     manifest.returnSchema = {
-      type: 'Command',
       commands: [
         {
           command: { action: 'action-name', arguments: {} },
