@@ -42,7 +42,9 @@ function valid(value, number) {
       });
     });
   }
-  if (number === 4) return Object.keys(value).length === 2 &&\n    typeof value.fileName === 'string' && value.fileName.trim().length > 0 &&\n    typeof value.JavaScript === 'string' && value.JavaScript.trim().length > 0;
+  if (number === 4) return Object.keys(value).length === 2 &&
+    typeof value.fileName === 'string' && value.fileName.trim().length > 0 &&
+    typeof value.JavaScript === 'string' && value.JavaScript.trim().length > 0;
   if (number === 5) return typeof value.path === 'string' && value.path.length > 0;
   return false;
 }
