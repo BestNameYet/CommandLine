@@ -42,7 +42,7 @@ function valid(value, number) {
       });
     });
   }
-  if (number === 4) return typeof value.JavaScript === 'string' && value.JavaScript.trim().length > 0;
+  if (number === 4) return Object.keys(value).length === 2 &&\n    typeof value.fileName === 'string' && value.fileName.trim().length > 0 &&\n    typeof value.JavaScript === 'string' && value.JavaScript.trim().length > 0;
   if (number === 5) return typeof value.path === 'string' && value.path.length > 0;
   return false;
 }
@@ -95,8 +95,8 @@ async function main() {
     }))
   };
   if (number === 4) {
-    manifest.returnSchema = { JavaScript: 'Executable JavaScript source code as a non-empty string' };
-    manifest.rule = 'Issue #4 comments shall consist only of JSON objects containing executable JavaScript source code.';
+    manifest.returnSchema = {\n      fileName: 'Non-empty JavaScript file name',\n      JavaScript: 'Non-empty executable JavaScript source code'\n    };
+    manifest.rule = 'Issue #4 comments shall be JSON objects with exactly two keys: fileName and JavaScript.';
   }
   if (number === 3) {
     manifest.definitions = [
