@@ -38,42 +38,42 @@ async function main() {
       {
         action: 'create',
         arguments: {
-          path: { type: 'string', expectation: 'Proposed repository-relative destination path; no file is created until commit. Do not use JavaScript-file examples.', example: 'docs/example.txt' },
-          contentCommentId: { type: 'integer', expectation: 'Issue comment ID containing file content.' }
+          path: { type: 'string', description: 'Proposed repository-relative destination path; no file is created until commit. Do not use JavaScript-file examples.', example: 'docs/example.txt' },
+          contentCommentId: { type: 'integer', description: 'Issue comment ID containing file content.' }
         }
       },
       {
         action: 'read',
         arguments: {
-          path: { type: 'string', expectation: 'Repository-relative file or directory path to read.', example: 'docs/example.txt' }
+          path: { type: 'string', description: 'Repository-relative file or directory path to read.', example: 'docs/example.txt' }
         }
       },
       {
         action: 'update',
         arguments: {
-          path: { type: 'string', expectation: 'Proposed update target path; changes are not persisted until commit. Do not use JavaScript-file examples.', example: 'docs/example.txt' },
-          contentCommentId: { type: 'integer', expectation: 'Issue comment ID containing replacement content.' }
+          path: { type: 'string', description: 'Proposed update target path; changes are not persisted until commit. Do not use JavaScript-file examples.', example: 'docs/example.txt' },
+          contentCommentId: { type: 'integer', description: 'Issue comment ID containing replacement content.' }
         }
       },
       {
         action: 'delete',
         arguments: {
-          path: { type: 'string', expectation: 'Repository-relative file or directory path to delete.', example: 'docs/example.txt' }
+          path: { type: 'string', description: 'Repository-relative file or directory path to delete.', example: 'docs/example.txt' }
         }
       },
       {
         action: 'commit',
         arguments: {
-          commentId: { type: 'integer', expectation: 'Issue comment ID containing the file operation to commit.' },
-          message: { type: 'string', expectation: 'Git commit message.' }
+          commentId: { type: 'integer', description: 'Issue comment ID containing the file operation to commit.' },
+          message: { type: 'string', description: 'Git commit message.' }
         }
       },
       {
         action: 'execute',
         arguments: {
-          JavaScript: { type: 'string', expectation: 'JavaScript source code to execute.' },
-          dependencies: { type: 'array', items: { type: 'string' }, expectation: 'Paths to other files required to execute the JavaScript; an empty array means no file dependencies.' },
-          arguments: { type: 'object', expectation: 'Named runtime arguments supplied to the JavaScript; may be empty.' }
+          JavaScript: { type: 'string', description: 'JavaScript source code to execute.' },
+          dependencies: { type: 'array', items: { type: 'string' }, description: 'Paths to other files required to execute the JavaScript; an empty array means no file dependencies.' },
+          arguments: { type: 'object', description: 'Named runtime arguments supplied to the JavaScript; may be empty.' }
         }
       }
     ];
