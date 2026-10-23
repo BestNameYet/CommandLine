@@ -97,7 +97,10 @@ async function main() {
     }))
   };
   if (number === 4) {
-    manifest.returnSchema = {\n      fileName: 'Non-empty JavaScript file name',\n      JavaScript: 'Non-empty executable JavaScript source code'\n    };
+    manifest.returnSchema = {
+      fileName: 'Non-empty JavaScript file name',
+      JavaScript: 'Non-empty executable JavaScript source code'
+    };
     manifest.rule = 'Issue #4 comments shall be JSON objects with exactly two keys: fileName and JavaScript.';
   }
   if (number === 3) {
