@@ -49,8 +49,9 @@ function safe(value) {
 }
 
 const source = String(original.body || '').trim();
+if (source === 'gh>' || !/^gh>\s+/.test(source)) { console.log('No executable gh> input'); process.exit(0); }
 let result;
-try { result = gh(argsFrom(source)); }
+try { result = gh(argsFrom(source.slice(3).trim())); }
 catch (e) { result = { code: 1, stdout: '', stderr: e.message }; }
 
 const output = JSON.stringify({
@@ -61,13 +62,24 @@ const output = JSON.stringify({
   stdout: safe(result.stdout),
   stderr: safe(result.stderr)
 }, null, 2);
-const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'issue6-gh-'));
-try {
-  const file = path.join(dir, 'result.json');
-  fs.writeFileSync(file, output);
-  const posted = gh(['issue', 'comment', '6', '--repo', repo, '--body-file', file]);
-  if (posted.code !== 0) throw Error('Unable to publish result; input preserved: ' + safe(posted.stderr));
-  const removed = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id, '--method', 'DELETE']);
-  if (removed.code !== 0) throw Error('Result posted, but input cleanup failed: ' + safe(removed.stderr));
-  console.log(JSON.stringify({ sourceCommentId: original.id, published: true, deleted: true }));
-} finally { fs.rmSync(dir, { recursive: true, force: true }); }
+
+function publish(body) {
+  const response = gh(['api', 'repos/' + repo + '/issues/6/comments',
+    '--method', 'POST', '-f', 'body=' + body, '--jq', '.id']);
+  if (response.code !== 0) throw Error('Result publication failed: ' + safe(response.stderr));
+  const id = Number(response.stdout.trim());
+  if (!Number.isSafeInteger(id) || id < 1) throw Error('Invalid result comment ID');
+  return id;
+}
+const outputCommentId = publish(output);
+const referenceCommentId = publish(JSON.stringify({
+  command: source,
+  responseCommentId: outputCommentId
+}, null, 2));
+const removed = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id,
+  '--method', 'DELETE']);
+if (removed.code !== 0) throw Error('Reference published but input cleanup failed');
+try { publish('gh>'); }
+catch (error) { console.error('Prompt publication failed: ' + error.message); }
+console.log(JSON.stringify({ responseCommentId: outputCommentId,
+  referenceCommentId, sourceCommentId: original.id }));
