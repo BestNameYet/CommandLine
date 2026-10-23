@@ -67,6 +67,13 @@ async function main() {
           commentId: { type: 'integer', expectation: 'Issue comment ID containing the file operation to commit.' },
           message: { type: 'string', expectation: 'Git commit message.' }
         }
+      },
+      {
+        action: 'execute',
+        arguments: {
+          commentId: { type: 'integer', expectation: 'Comment ID in Issue #4 containing JavaScript source to execute.' },
+          arguments: { type: 'object', expectation: 'Named runtime arguments supplied to the JavaScript; may be empty.' }
+        }
       }
     ];
     manifest.returnSchema = {
