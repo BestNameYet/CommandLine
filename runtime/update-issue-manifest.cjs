@@ -36,30 +36,37 @@ async function main() {
   if (number === 3) {
     manifest.definitions = [
       {
-        key: 'commands',
-        type: 'array',
-        expectation: 'Array of one or more objects, each containing command and description.'
+        action: 'create',
+        arguments: {
+          path: { type: 'string', expectation: 'Repository-relative destination file path.' },
+          contentCommentId: { type: 'integer', expectation: 'Issue comment ID containing file content.' }
+        }
       },
       {
-        key: 'commands[].command',
-        type: 'object',
-        expectation: 'Object containing action and arguments.'
+        action: 'read',
+        arguments: {
+          path: { type: 'string', expectation: 'Repository-relative file or directory path to read.' }
+        }
       },
       {
-        key: 'commands[].command.action',
-        type: 'string',
-        expectation: 'One of create, read, update, delete, commit. No other actions are permitted.',
-        allowedValues: ['create', 'read', 'update', 'delete', 'commit']
+        action: 'update',
+        arguments: {
+          path: { type: 'string', expectation: 'Repository-relative existing file path.' },
+          contentCommentId: { type: 'integer', expectation: 'Issue comment ID containing replacement content.' }
+        }
       },
       {
-        key: 'commands[].command.arguments',
-        type: 'object',
-        expectation: 'Named input arguments for the action; an empty object is allowed.'
+        action: 'delete',
+        arguments: {
+          path: { type: 'string', expectation: 'Repository-relative file or directory path to delete.' }
+        }
       },
       {
-        key: 'commands[].description',
-        type: 'string',
-        expectation: 'Human-readable description of the corresponding command.'
+        action: 'commit',
+        arguments: {
+          commentId: { type: 'integer', expectation: 'Issue comment ID containing the file operation to commit.' },
+          message: { type: 'string', expectation: 'Git commit message.' }
+        }
       }
     ];
     manifest.returnSchema = {
