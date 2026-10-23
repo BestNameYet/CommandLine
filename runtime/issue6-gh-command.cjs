@@ -7,11 +7,11 @@ const { spawnSync } = require('node:child_process');
 const event = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
 const repo = process.env.GITHUB_REPOSITORY;
 const original = event.comment;
-if (event.action !== 'created' || event.issue?.number !== 6 ||
-    event.repository?.full_name !== repo ||
-    original?.user?.login !== event.repository?.owner?.login) {
-  throw Error('Only owner-authored commands on Issue #6 are accepted');
+if (!['created', 'edited'].includes(event.action) || event.issue?.number !== 6 ||
+    event.repository?.full_name !== repo) {
+  throw Error('Only created or edited comments on Issue #6 are accepted');
 }
+if (original?.user?.type === 'Bot') process.exit(0);
 if (!process.env.GH_TOKEN) throw Error('GH_TOKEN is required');
 
 function argsFrom(input) {
@@ -49,7 +49,21 @@ function safe(value) {
 }
 
 const source = String(original.body || '').trim();
-if (source === 'gh>' || !/^gh>\s+/.test(source)) { console.log('No executable gh> input'); process.exit(0); }
+function resetPrompt() {
+  const updated = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id,
+    '--method', 'PATCH', '-f', 'body=gh>']);
+  if (updated.code !== 0) throw Error('Prompt update failed: ' + safe(updated.stderr));
+}
+if (!/^gh>(?:\s|$)/.test(source)) {
+  // Re-read before editing so a stale event cannot erase a now-valid command.
+  const current = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id]);
+  if (current.code !== 0) throw Error('Comment read failed: ' + safe(current.stderr));
+  const comment = JSON.parse(current.stdout);
+  if (comment.user?.type !== 'Bot' && !/^gh>(?:\s|$)/.test(String(comment.body || '').trim())) resetPrompt();
+  process.exit(0);
+}
+if (source === 'gh>' || event.action !== 'created' ||
+    original?.user?.login !== event.repository?.owner?.login) process.exit(0);
 let result;
 try { result = gh(argsFrom(source.slice(3).trim())); }
 catch (e) { result = { code: 1, stdout: '', stderr: e.message }; }
@@ -83,8 +97,6 @@ const referenceCommentId = publish(JSON.stringify({
   command: source,
   responseCommentId: outputCommentId
 }, null, 2), 6);
-const updated = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id,
-  '--method', 'PATCH', '-f', 'body=gh>']);
-if (updated.code !== 0) throw Error('Prompt update failed: ' + safe(updated.stderr));
+resetPrompt();
 console.log(JSON.stringify({ responseCommentId: outputCommentId,
   referenceCommentId, sourceCommentId: original.id }));

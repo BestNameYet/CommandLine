@@ -1,13 +1,13 @@
 name: Issue 6 GitHub CLI
 on:
   issue_comment:
-    types: [created]
+    types: [created, edited]
 
 permissions: {}
 
 jobs:
   execute:
-    if: ${{ github.event.issue.number == 6 && github.event.comment.user.login == github.repository_owner }}
+    if: ${{ github.event.issue.number == 6 && github.event.comment.user.type != 'Bot' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     concurrency:

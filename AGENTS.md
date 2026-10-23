@@ -14,7 +14,7 @@ To execute a requested `gh` command, create a **new comment** on Issue #6 beginn
 gh> issue view 6 --repo BestNameYet/CommandLine --json number,title
 ```
 
-Do not edit an existing comment to submit a command: the workflow responds to newly created comments only. It executes owner-authored commands through GitHub Actions.
+Do not edit an existing comment to submit a command: command execution responds to newly created comments only. New and edited human comments outside the `gh>` input format are edited to exactly `gh>` while preserving their IDs; bot responses are unchanged. It executes owner-authored commands through GitHub Actions.
 
 The runner publishes complete stdout, stderr, and exit status to a comment in [Issue #7](https://github.com/BestNameYet/CommandLine/issues/7). In Issue #6 it publishes a separate comment containing the original command and `responseCommentId`, which identifies the output comment. The submitted command comment is edited back to `gh>` after both publications succeed.
 
