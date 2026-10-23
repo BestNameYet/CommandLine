@@ -34,6 +34,33 @@ async function main() {
     }))
   };
   if (number === 3) {
+    manifest.definitions = [
+      {
+        key: 'commands',
+        type: 'array',
+        expectation: 'Array of one or more objects, each containing command and description.'
+      },
+      {
+        key: 'commands[].command',
+        type: 'object',
+        expectation: 'Object containing action and arguments.'
+      },
+      {
+        key: 'commands[].command.action',
+        type: 'string',
+        expectation: 'Non-empty action name identifying the requested operation.'
+      },
+      {
+        key: 'commands[].command.arguments',
+        type: 'object',
+        expectation: 'Named input arguments for the action; an empty object is allowed.'
+      },
+      {
+        key: 'commands[].description',
+        type: 'string',
+        expectation: 'Human-readable description of the corresponding command.'
+      }
+    ];
     manifest.returnSchema = {
       commands: [
         {
