@@ -71,7 +71,8 @@ async function main() {
       {
         action: 'execute',
         arguments: {
-          commentId: { type: 'integer', expectation: 'Comment ID in Issue #4 containing JavaScript source to execute.' },
+          JavaScript: { type: 'string', expectation: 'JavaScript source code to execute.' },
+          dependencies: { type: 'array', items: { type: 'string' }, expectation: 'Paths to other files required to execute the JavaScript; an empty array means no file dependencies.' },
           arguments: { type: 'object', expectation: 'Named runtime arguments supplied to the JavaScript; may be empty.' }
         }
       }
