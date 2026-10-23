@@ -38,7 +38,7 @@ async function main() {
       type: 'Command',
       description: ['Description of the corresponding command'],
       commands: [
-        { command: 'command-name', arguments: {} }
+        { type: 'Command', action: 'action-name', arguments: {} }
       ]
     };
   }
