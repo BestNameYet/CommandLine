@@ -16,12 +16,6 @@ async function api(path, options = {}) {
   if (!response.ok) throw new Error(`GitHub API ${response.status}: ${await response.text()}`);
   return response.status === 204 ? null : response.json();
 }
-function fence(body) {
-  const runs = body.match(/`+/g) ?? [];
-  const longest = Math.max(2, ...runs.map(s => s.length));
-  const mark = '`'.repeat(longest + 1);
-  return `${mark}text\n${body}\n${mark}`;
-}
 async function main() {
   const issue = await api(`/issues/${number}`);
   let comments = [];
@@ -31,21 +25,24 @@ async function main() {
     if (chunk.length < 100) break;
   }
   comments.sort((a, b) => a.id - b.id);
-  const original = (issue.body || '').split('<!-- comment-manifest:start -->')[0].trimEnd();
-  const lines = [
-    '<!-- comment-manifest:start -->',
-    '## Comment manifest',
-    `Issue #${number} · ${comments.length} comments · regenerated automatically on comment creation or edit.`,
-    ''
-  ];
-  for (const comment of comments) {
-    lines.push(`### [Comment ${comment.id}](${comment.html_url})`);
-    lines.push('**Content:**');
-    lines.push(fence(comment.body));
-    lines.push('');
+  const manifest = {
+    type: 'Manifest',
+    issue: number,
+    comments: comments.map(comment => ({
+      commentId: comment.id,
+      content: comment.body
+    }))
+  };
+  if (number === 3) {
+    manifest.returnSchema = {
+      type: 'Command',
+      description: ['Description of the corresponding command'],
+      commands: [
+        { command: 'command-name', arguments: {} }
+      ]
+    };
   }
-  lines.push('<!-- comment-manifest:end -->');
-  const body = [original, lines.join('\n')].filter(Boolean).join('\n\n');
+  const body = JSON.stringify(manifest, null, 2);
   if (Buffer.byteLength(body, 'utf8') > 60000) throw new Error('Issue body exceeds safe manifest size; no update performed');
   await api(`/issues/${number}`, { method: 'PATCH', body: JSON.stringify({ body }), headers: { 'Content-Type': 'application/json' } });
   console.log(`Updated Issue #${number} manifest with ${comments.length} comments`);
