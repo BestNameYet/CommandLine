@@ -16,7 +16,58 @@ async function api(path, options = {}) {
   if (!response.ok) throw new Error(`GitHub API ${response.status}: ${await response.text()}`);
   return response.status === 204 ? null : response.json();
 }
+function object(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
+function valid(value, number) {
+  if (!object(value)) return false;
+  if (number === 5) {
+    manifest.returnSchema = { path: 'Non-empty path string', content: 'Optional file content' };
+  }
+  if (number === 3) {
+    const entries = value.commands;
+    const contract = {
+      create: { path: 'string', contentCommentId: 'integer' },
+      read: { path: 'string' },
+      update: { path: 'string', contentCommentId: 'integer' },
+      delete: { path: 'string' },
+      commit: { commentId: 'integer', message: 'string' },
+      execute: { JavaScript: 'string', dependencies: 'stringArray', arguments: 'object' }
+    };
+    return Array.isArray(entries) && entries.length > 0 && entries.every(item => {
+      if (!object(item) || typeof item.description !== 'string' || !object(item.command)) return false;
+      const { action, arguments: args } = item.command;
+      if (!Object.prototype.hasOwnProperty.call(contract, action) || !object(args)) return false;
+      return Object.entries(contract[action]).every(([key, type]) => {
+        const v = args[key];
+        return type === 'integer' ? Number.isSafeInteger(v) :
+          type === 'string' ? typeof v === 'string' :
+          type === 'stringArray' ? Array.isArray(v) && v.every(x => typeof x === 'string') :
+          object(v);
+      });
+    });
+  }
+  if (number === 4) return typeof value.JavaScript === 'string' && value.JavaScript.trim().length > 0;
+  if (number === 5) return typeof value.path === 'string' && value.path.length > 0;
+  return false;
+}
+async function validateComment(id) {
+  if (!Number.isSafeInteger(id) || id <= 0) return;
+  const comment = await api(`/issues/comments/${id}`);
+  if (comment.issue_url !== `${base}/issues/${number}`) throw new Error('Comment is not from expected issue');
+  if (comment.body === 'invalid JSON' || comment.body === 'invalid return schema') return;
+  let value, error;
+  try { value = JSON.parse(comment.body); } catch { error = 'invalid JSON'; }
+  if (!error && !valid(value, number)) error = 'invalid return schema';
+  if (error) {
+    await api(`/issues/comments/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body: error })
+    });
+    console.log(`Comment ${id}: ${error}`);
+  }
+}
 async function main() {
+  await validateComment(Number(process.env.COMMENT_ID));
   const issue = await api(`/issues/${number}`);
   let comments = [];
   for (let page = 1; ; page++) {
@@ -34,6 +85,7 @@ async function main() {
     }))
   };
   if (number === 4) {
+    manifest.returnSchema = { JavaScript: 'Executable JavaScript source code as a non-empty string' };
     manifest.rule = 'Issue #4 comments shall consist only of JSON objects containing executable JavaScript source code.';
   }
   if (number === 3) {
