@@ -11,7 +11,14 @@ if (!['created', 'edited'].includes(event.action) || event.issue?.number !== 6 |
     event.repository?.full_name !== repo) {
   throw Error('Only created or edited comments on Issue #6 are accepted');
 }
-if (original?.user?.type === 'Bot') process.exit(0);
+const actor = event.sender?.login || original?.user?.login;
+const owner = event.repository?.owner?.login;
+const inputCommentId = process.env.ISSUE6_INPUT_COMMENT_ID;
+if (!/^\d+$/.test(inputCommentId || '')) throw Error('ISSUE6_INPUT_COMMENT_ID is required');
+const isInput = String(original.id) === inputCommentId;
+// The reusable first prompt is bot-authored; authorize its owner's edits by sender.
+if (original?.user?.type === 'Bot' && !(event.action === 'edited' &&
+    isInput && actor === owner)) process.exit(0);
 if (!process.env.GH_TOKEN) throw Error('GH_TOKEN is required');
 
 function argsFrom(input) {
@@ -54,16 +61,17 @@ function resetPrompt() {
     '--method', 'PATCH', '-f', 'body=gh>']);
   if (updated.code !== 0) throw Error('Prompt update failed: ' + safe(updated.stderr));
 }
-if (!/^gh>(?:\s|$)/.test(source)) {
+if (!isInput || !/^gh>(?:\s|$)/.test(source)) {
   // Re-read before editing so a stale event cannot erase a now-valid command.
   const current = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id]);
   if (current.code !== 0) throw Error('Comment read failed: ' + safe(current.stderr));
   const comment = JSON.parse(current.stdout);
-  if (comment.user?.type !== 'Bot' && !/^gh>(?:\s|$)/.test(String(comment.body || '').trim())) resetPrompt();
+  if ((comment.user?.type !== 'Bot' || (isInput && actor === owner)) &&
+      (!isInput || !/^gh>(?:\s|$)/.test(String(comment.body || '').trim()))) resetPrompt();
   process.exit(0);
 }
 if (source === 'gh>' ||
-    original?.user?.login !== event.repository?.owner?.login) process.exit(0);
+    actor !== owner) process.exit(0);
 let result;
 try { result = gh(argsFrom(source.slice(3).trim())); }
 catch (e) { result = { code: 1, stdout: '', stderr: e.message }; }

@@ -7,7 +7,7 @@ permissions: {}
 
 jobs:
   execute:
-    if: ${{ github.event.issue.number == 6 && github.event.comment.user.type != 'Bot' }}
+    if: ${{ github.event.issue.number == 6 && github.event.sender.type != 'Bot' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     concurrency:
@@ -16,11 +16,20 @@ jobs:
     permissions:
       contents: read
       issues: write
+    env:
+      # The first comment is the single reusable command input.
+      ISSUE6_INPUT_COMMENT_ID: '6358997143'
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Execute command and publish its output
+      - name: Execute only the first input comment when edited by the owner
+        if: format('{0}', github.event.comment.id) == env.ISSUE6_INPUT_COMMENT_ID && github.event.sender.login == github.repository_owner
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node runtime/issue6-gh-command.cjs
+      - name: Reset other human comments without executing them
+        if: format('{0}', github.event.comment.id) != env.ISSUE6_INPUT_COMMENT_ID && github.event.comment.user.type != 'Bot'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node runtime/issue6-gh-command.cjs

@@ -8,13 +8,13 @@ Read this `AGENTS.md`, the repository's current [README.md](README.md), and any 
 
 **[Issue #6 — GitHub CLI command console](https://github.com/BestNameYet/CommandLine/issues/6) is the authorized repository command line for GitHub CLI operations.**
 
-To execute a requested `gh` command, create or edit a comment on Issue #6 beginning with `gh>`, followed by CLI arguments. Do not repeat `gh` after the prompt:
+To execute a requested `gh` command, edit only the first input comment on Issue #6 (ID `6358997143`) beginning with `gh>`, followed by CLI arguments. Do not repeat `gh` after the prompt:
 
 ```text
 gh> issue view 6 --repo BestNameYet/CommandLine --json number,title
 ```
 
-Both newly created and edited owner-authored command comments execute. A standalone `gh>` is a prompt and never executes. New and edited human comments outside the `gh>` input format are edited to exactly `gh>` while preserving their IDs; bot responses are unchanged.
+Only owner edits to that fixed input comment can execute commands. The workflow gates execution on its ID and the event sender, because the first prompt is bot-authored. A standalone `gh>` never executes. Other human comments are reset to `gh>` without executing; bot responses remain unchanged. Reuse the same input comment for every command.
 
 The runner publishes complete stdout, stderr, and exit status to a comment in [Issue #7](https://github.com/BestNameYet/CommandLine/issues/7). In Issue #6 it publishes a separate comment containing the original command and `responseCommentId`, which identifies the output comment. The submitted command comment is edited back to `gh>` after both publications succeed.
 

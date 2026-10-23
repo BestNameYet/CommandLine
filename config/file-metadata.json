@@ -1,13 +1,13 @@
 {
   "files": {
     "runtime/issue6-gh-command.cjs": {
-      "description": "Executes new and edited owner commands, publishes output, and normalizes invalid inputs using PATCH."
+      "description": "Executes only the configured first input, authorizes owner edits by sender, ignores bare prompts, and resets other inputs using PATCH."
     },
     "tests/issue6-gh-command.test.cjs": {
-      "description": "Thirteen regression tests for edited command execution, prompt no-ops, publication, and normalization."
+      "description": "Eighteen regression tests covering fixed input ID, owner edits to the bot-authored prompt, no-op prompts, normalization, and publication."
     },
     ".github/workflows/issue-6-gh.yml": {
-      "description": "Issue 6 command execution and normalization on created and edited human comments."
+      "description": "Restricts command execution to owner edits of first input comment 6358997143; normalizes other human comments."
     },
     "docs/issue-6/README.md": {
       "description": "Issue 6 protocol, format enforcement, and regression test command."
