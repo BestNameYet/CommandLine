@@ -33,6 +33,9 @@ async function main() {
       content: comment.body
     }))
   };
+  if (number === 4) {
+    manifest.rule = 'Issue #4 comments shall consist only of JSON objects containing executable JavaScript source code.';
+  }
   if (number === 3) {
     manifest.definitions = [
       {
