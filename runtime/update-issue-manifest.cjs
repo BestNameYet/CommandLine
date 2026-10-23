@@ -35,10 +35,12 @@ async function main() {
   };
   if (number === 3) {
     manifest.returnSchema = {
-      type: 'Command',
-      description: ['Description of the corresponding command'],
+      type: 'CommandBatch',
       commands: [
-        { type: 'Command', action: 'action-name', arguments: {} }
+        {
+          command: { type: 'Command', action: 'action-name', arguments: {} },
+          description: 'Description of the command'
+        }
       ]
     };
   }
