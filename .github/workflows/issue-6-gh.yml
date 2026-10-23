@@ -1,0 +1,26 @@
+name: Issue 6 GitHub CLI
+on:
+  issue_comment:
+    types: [created]
+
+permissions: {}
+
+jobs:
+  execute:
+    if: ${{ github.event.issue.number == 6 && github.event.comment.user.login == github.repository_owner }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: issue-6-gh-commands
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Execute command and publish its output
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node runtime/issue6-gh-command.cjs
