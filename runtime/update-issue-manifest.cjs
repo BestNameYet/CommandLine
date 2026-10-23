@@ -50,15 +50,19 @@ async function validateComment(id) {
   if (!Number.isSafeInteger(id) || id <= 0) return;
   const comment = await api(`/issues/comments/${id}`);
   if (comment.issue_url !== `${base}/issues/${number}`) throw new Error('Comment is not from expected issue');
-  if (comment.body === 'invalid JSON' || comment.body === 'invalid return schema') return;
   let value, error;
-  try { value = JSON.parse(comment.body); } catch { error = 'invalid JSON'; }
-  if (!error && !valid(value, number)) error = 'invalid return schema';
+  try { value = JSON.parse(comment.body); } catch { error = 'invalid JSON object'; }
+  if (!error && object(value) &&
+      (Object.prototype.hasOwnProperty.call(value, 'invalid JSON object') ||
+       Object.prototype.hasOwnProperty.call(value, 'invalid schema'))) return;
+  if (!error && !valid(value, number)) error = 'invalid schema';
   if (error) {
+    const original = error === 'invalid JSON object' ? comment.body : value;
+    const replacement = JSON.stringify({ [error]: original }, null, 2);
     await api(`/issues/comments/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ body: error })
+      body: JSON.stringify({ body: replacement })
     });
     console.log(`Comment ${id}: ${error}`);
   }
