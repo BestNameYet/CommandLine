@@ -80,7 +80,16 @@ async function main() {
   const manifest = {
     type: 'Manifest',
     issue: number,
-    comments: comments.map(comment => ({
+    comments: comments.filter(comment => {
+      try {
+        const entry = JSON.parse(comment.body);
+        return !object(entry) ||
+          (!Object.prototype.hasOwnProperty.call(entry, 'invalid JSON object') &&
+           !Object.prototype.hasOwnProperty.call(entry, 'invalid schema'));
+      } catch {
+        return false;
+      }
+    }).map(comment => ({
       commentId: comment.id,
       content: comment.body
     }))
