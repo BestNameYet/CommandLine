@@ -69,6 +69,35 @@ async function validateComment(id) {
     console.log(`Comment ${id}: ${error}`);
   }
 }
+function manifestEntry(comment, issueNumber) {
+  let entry;
+  try { entry = JSON.parse(comment.body); } catch { return null; }
+  if (!valid(entry, issueNumber)) return null;
+
+  if (issueNumber === 4) {
+    const descriptions = {
+      'create.cjs': 'Create a file on a configured Git working branch.',
+      'read.cjs': 'Read a file or directory from a configured Git branch.'
+    };
+    return {
+      commentId: comment.id,
+      fileName: entry.fileName,
+      description: descriptions[entry.fileName] || 'Executable JavaScript source.'
+    };
+  }
+  if (issueNumber === 5) {
+    return {
+      commentId: comment.id,
+      fileName: entry.path.split('/').pop(),
+      description: 'File object at ' + entry.path
+    };
+  }
+  return {
+    commentId: comment.id,
+    fileName: null,
+    description: 'Command actions: ' + entry.commands.map(item => item.command.action).join(', ')
+  };
+}
 async function main() {
   await validateComment(Number(process.env.COMMENT_ID));
   const issue = await api(`/issues/${number}`);
@@ -82,19 +111,7 @@ async function main() {
   const manifest = {
     type: 'Manifest',
     issue: number,
-    comments: comments.filter(comment => {
-      try {
-        const entry = JSON.parse(comment.body);
-        return !object(entry) ||
-          (!Object.prototype.hasOwnProperty.call(entry, 'invalid JSON object') &&
-           !Object.prototype.hasOwnProperty.call(entry, 'invalid schema'));
-      } catch {
-        return false;
-      }
-    }).map(comment => ({
-      commentId: comment.id,
-      content: comment.body
-    }))
+    comments: comments.map(comment => manifestEntry(comment, number)).filter(Boolean)
   };
   if (number === 4) {
     manifest.returnSchema = {
