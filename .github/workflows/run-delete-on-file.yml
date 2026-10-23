@@ -1,0 +1,34 @@
+name: Run comment deletion file
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'runtime/delete-comment.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  execute:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run deletion file if present
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          if [[ -f runtime/delete-comment.mjs ]]; then
+            node runtime/delete-comment.mjs
+          else
+            echo "runtime/delete-comment.mjs not found"
+            exit 1
+          fi
