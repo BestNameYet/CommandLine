@@ -48,7 +48,8 @@ async function main() {
       {
         key: 'commands[].command.action',
         type: 'string',
-        expectation: 'Non-empty action name identifying the requested operation.'
+        expectation: 'One of create, read, update, delete, commit. No other actions are permitted.',
+        allowedValues: ['create', 'read', 'update', 'delete', 'commit']
       },
       {
         key: 'commands[].command.arguments',
@@ -64,7 +65,7 @@ async function main() {
     manifest.returnSchema = {
       commands: [
         {
-          command: { action: 'action-name', arguments: {} },
+          command: { action: 'read', arguments: {} },
           description: 'Description of the command'
         }
       ]
