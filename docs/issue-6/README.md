@@ -22,7 +22,7 @@ Do not repeat `gh` after the prompt: the workflow invokes the `gh` executable it
 2. **Parse.** The executor checks for the `gh>` prefix, removes it, and parses the remaining arguments.
 3. **Execute.** Node.js `spawnSync('gh', args)` invokes the GitHub CLI on an `ubuntu-latest` GitHub Actions runner without a shell. The workflow passes `GH_TOKEN` with `contents: read` and `issues: write` permissions.
 4. **Store full output.** The runner publishes a new comment in **[Issue #7 — Command Output Storage](https://github.com/BestNameYet/CommandLine/issues/7)**. This comment holds the command's exit code, stdout, stderr, and source comment ID. Its new GitHub comment ID is `responseCommentId`.
-5. **Publish command reference.** The runner posts a separate comment in **Issue #6** containing only a copy of the command and `responseCommentId`.
+5. **Publish command reference.** The runner posts a separate comment in **Issue #6** containing `originatorCommentId` (the submitted command comment ID), a copy of the command, and `responseCommentId`.
 6. **Reset input.** After the two publications succeed, the runner edits the originally submitted command comment so its entire body is `gh>`. The comment ID is preserved; the command is **not** deleted.
 
 ### Output comment in Issue #7
@@ -41,12 +41,13 @@ Do not repeat `gh` after the prompt: the workflow invokes the `gh` executable it
 
 ```json
 {
+  "originatorCommentId": 12345,
   "command": "gh> issue view 6 --repo BestNameYet/CommandLine",
   "responseCommentId": 67890
 }
 ```
 
-IDs in the examples are illustrative. Follow the `responseCommentId` to retrieve the output comment; the full output is **not** embedded in the Issue #6 reference.
+IDs in the examples are illustrative. Use `originatorCommentId` to identify the input comment and follow `responseCommentId` to retrieve the output comment; the full output is **not** embedded in the Issue #6 reference.
 
 ## Important operational distinctions
 
