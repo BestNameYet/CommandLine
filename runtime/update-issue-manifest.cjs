@@ -38,7 +38,7 @@ async function main() {
       type: 'CommandBatch',
       commands: [
         {
-          command: { type: 'Command', action: 'action-name', arguments: {} },
+          command: { action: 'action-name', arguments: {} },
           description: 'Description of the command'
         }
       ]
