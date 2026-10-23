@@ -8,7 +8,7 @@
 
 Issue #6 is a GitHub CLI command surface. It is **not** the destination for full command stdout/stderr, and it does not run the separate `render.cjs` program.
 
-The first comment is the visible `gh>` prompt (currently comment ID `6358997143`). A submitted command is a **new comment**, prefixed with `gh>`, for example:
+The first comment is the visible `gh>` prompt (currently comment ID `6358997143`). A command is submitted by creating or editing a comment, prefixed with `gh>`, for example:
 
 ```text
 gh> issue view 6 --repo BestNameYet/CommandLine --json number,title
@@ -18,7 +18,7 @@ Do not repeat `gh` after the prompt: the workflow invokes the `gh` executable it
 
 ## Implemented command lifecycle
 
-1. **Trigger.** A newly **created** Issue #6 comment triggers `issue-6-gh.yml`. Only comments authored by the repository owner are eligible. Edits trigger comment-format enforcement only; they never execute commands.
+1. **Trigger.** A newly **created** or **edited** Issue #6 comment triggers `issue-6-gh.yml`. Only commands authored by the repository owner execute. A standalone `gh>` never executes.
 2. **Parse.** The executor checks for the `gh>` prefix, removes it, and parses the remaining arguments.
 3. **Execute.** Node.js `spawnSync('gh', args)` invokes the GitHub CLI on an `ubuntu-latest` GitHub Actions runner without a shell. The workflow passes `GH_TOKEN` with `contents: read` and `issues: write` permissions.
 4. **Store full output.** The runner publishes a new comment in **[Issue #7 — Command Output Storage](https://github.com/BestNameYet/CommandLine/issues/7)**. This comment holds the command's exit code, stdout, stderr, and source comment ID. Its new GitHub comment ID is `responseCommentId`.
@@ -52,7 +52,7 @@ IDs in the examples are illustrative. Use `originatorCommentId` to identify the 
 ## Important operational distinctions
 
 - The first prompt comment remains the earliest comment in Issue #6. The current workflow resets **each newly submitted command comment** to `gh>`; it does not move the original first comment.
-- GitHub comment IDs are stable when bodies are edited. Editing a comment invokes format enforcement only; it does **not** execute a command.
+- GitHub comment IDs are stable when bodies are edited. Creating or editing an owner-authored comment containing `gh>` plus arguments executes that command. A standalone `gh>` does nothing.
 - If output or reference publication fails, the submitted command comment is not reset. If reference publication fails after output publication, an output comment may exist without a reference.
 - Execution failures are captured with a nonzero exit code and stderr when possible; they do not necessarily prevent the response from being published.
 - Older Issue #6 comments predate this arrangement. In particular, reference comment `6358997306` points to `6358997143`, which was later repurposed as the first `gh>` prompt. This is a **historical stale reference**.
@@ -65,6 +65,6 @@ This README records the **existing implementation**; it does not prescribe addit
 
 ## Comment format enforcement
 
-Only human inputs beginning with `gh>` (including a bare prompt) and bot responses are retained as written. On `created` and `edited` events in Issue #6, other human comment bodies are replaced with exactly `gh>` using PATCH. The comment and its ID are preserved; no comment is deleted. Bot responses are unchanged. Only newly created owner-authored command inputs execute. The runner re-reads invalid comments before resetting them to avoid overwriting an input that has since become valid.
+Only human inputs beginning with `gh>` (including a bare prompt) and bot responses are retained as written. On `created` and `edited` events in Issue #6, other human comment bodies are replaced with exactly `gh>` using PATCH. The comment and its ID are preserved; no comment is deleted. Bot responses are unchanged. Both newly created and edited owner-authored command inputs execute; a standalone `gh>` never executes. The runner re-reads invalid comments before resetting them to avoid overwriting an input that has since become valid.
 
 Run the focused regression checks with `node --test tests/issue6-gh-command.test.cjs`.

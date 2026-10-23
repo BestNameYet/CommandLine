@@ -62,7 +62,7 @@ if (!/^gh>(?:\s|$)/.test(source)) {
   if (comment.user?.type !== 'Bot' && !/^gh>(?:\s|$)/.test(String(comment.body || '').trim())) resetPrompt();
   process.exit(0);
 }
-if (source === 'gh>' || event.action !== 'created' ||
+if (source === 'gh>' ||
     original?.user?.login !== event.repository?.owner?.login) process.exit(0);
 let result;
 try { result = gh(argsFrom(source.slice(3).trim())); }

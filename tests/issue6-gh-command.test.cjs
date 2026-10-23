@@ -34,7 +34,13 @@ for (const action of ['created', 'edited']) test(`invalid ${action} comment is e
 test('invalid comment from another human is normalized', () => assert.equal(patches(run({ login: 'visitor' })).length, 1));
 test('bot response remains unchanged', () => assert.equal(run({ login: 'github-actions[bot]', type: 'Bot' }).calls.length, 0));
 test('bare prompt remains unchanged', () => assert.equal(run({ body: 'gh>' }).calls.length, 0));
-test('edited command does not execute', () => assert.equal(run({ action: 'edited', body: 'gh> issue list' }).calls.length, 0));
+test('edited owner command executes, publishes, and resets', () => {
+  const result = run({ action: 'edited', body: 'gh> issue list' });
+  assert.deepEqual(result.calls[0], ['issue', 'list']);
+  assert.equal(posts(result).length, 2);
+  assert.equal(patches(result).length, 1);
+});
+test('edited bare prompt does not execute', () => assert.equal(run({ action: 'edited', body: 'gh>' }).calls.length, 0));
 test('another human cannot execute', () => assert.equal(run({ login: 'visitor', body: 'gh> issue list' }).calls.length, 0));
 test('owner command still publishes results and resets its input', () => {
   const result = run({ body: 'gh> issue list' });

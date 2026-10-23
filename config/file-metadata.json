@@ -1,10 +1,10 @@
 {
   "files": {
     "runtime/issue6-gh-command.cjs": {
-      "description": "Owner command execution, output publication, and PATCH-only input normalization."
+      "description": "Executes new and edited owner commands, publishes output, and normalizes invalid inputs using PATCH."
     },
     "tests/issue6-gh-command.test.cjs": {
-      "description": "Twelve focused regression tests for normalization and command execution."
+      "description": "Thirteen regression tests for edited command execution, prompt no-ops, publication, and normalization."
     },
     ".github/workflows/issue-6-gh.yml": {
       "description": "Issue 6 command execution and normalization on created and edited human comments."
