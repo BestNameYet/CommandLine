@@ -19,9 +19,6 @@ async function api(path, options = {}) {
 function object(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
 function valid(value, number) {
   if (!object(value)) return false;
-  if (number === 5) {
-    manifest.returnSchema = { path: 'Non-empty path string', content: 'Optional file content' };
-  }
   if (number === 3) {
     const entries = value.commands;
     const contract = {
