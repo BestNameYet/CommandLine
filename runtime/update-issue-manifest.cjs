@@ -17,6 +17,11 @@ async function api(path, options = {}) {
   return response.status === 204 ? null : response.json();
 }
 function object(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
+function renderedResponse(value) {
+  return object(value) && value.type === 'rendered-response' &&
+    Number.isSafeInteger(value.commandCommentId) && value.commandCommentId > 0 &&
+    Object.prototype.hasOwnProperty.call(value, 'response');
+}
 function valid(value, number) {
   if (!object(value)) return false;
   if (number === 3) {
@@ -57,7 +62,7 @@ async function validateComment(id) {
   if (!error && object(value) &&
       (Object.prototype.hasOwnProperty.call(value, 'invalid JSON object') ||
        Object.prototype.hasOwnProperty.call(value, 'invalid schema'))) return;
-  if (!error && !valid(value, number)) error = 'invalid schema';
+  if (!error && !(number === 3 && renderedResponse(value)) && !valid(value, number)) error = 'invalid schema';
   if (error) {
     const original = error === 'invalid JSON object' ? comment.body : value;
     const replacement = JSON.stringify({ [error]: original }, null, 2);
@@ -72,6 +77,9 @@ async function validateComment(id) {
 function manifestEntry(comment, issueNumber) {
   let entry;
   try { entry = JSON.parse(comment.body); } catch { return null; }
+  if (issueNumber === 3 && renderedResponse(entry)) {
+    return { commentId: comment.id, fileName: null, description: 'Rendered command response.' };
+  }
   if (!valid(entry, issueNumber)) return null;
 
   if (issueNumber === 4) {
@@ -79,7 +87,8 @@ function manifestEntry(comment, issueNumber) {
       'create.cjs': 'Create a file on a configured Git working branch.',
       'read.cjs': 'Read a file or directory from a configured Git branch.',
       'commit.cjs': 'Commit the file referenced by an Issue #5 comment to the configured working branch.',
-      'update.cjs': 'Update an existing file on a configured Git working branch using staged Issue #5 content.'
+      'update.cjs': 'Update an existing file on a configured Git working branch using staged Issue #5 content.',
+      'render.cjs': 'Post command results to comments; store read results in an issue numbered above 5 and write the result comment ID to the command.'
     };
     return {
       commentId: comment.id,
