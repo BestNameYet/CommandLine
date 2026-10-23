@@ -1,13 +1,13 @@
 {
   "files": {
     "runtime/issue6-gh-command.cjs": {
-      "description": "Executes only the configured first input, authorizes owner edits by sender, ignores bare prompts, and resets other inputs using PATCH."
+      "description": "Fixed-input command runtime with hidden blank-slot flags and reuse of flagged comments for Issue 6 responses."
     },
     "tests/issue6-gh-command.test.cjs": {
-      "description": "Eighteen regression tests covering fixed input ID, owner edits to the bot-authored prompt, no-op prompts, normalization, and publication."
+      "description": "Twenty regression tests covering input gating, edits, blank slot flags, response slot reuse, and publication."
     },
     ".github/workflows/issue-6-gh.yml": {
-      "description": "Restricts command execution to owner edits of first input comment 6358997143; normalizes other human comments."
+      "description": "Executes only owner edits of input 6358997143; clears other human comments into reusable response slots."
     },
     "docs/issue-6/README.md": {
       "description": "Issue 6 protocol, format enforcement, and regression test command."

@@ -18,11 +18,11 @@ Do not repeat `gh` after the prompt: the workflow invokes the `gh` executable it
 
 ## Implemented command lifecycle
 
-1. **Trigger.** Owner edits to the first input comment (ID `6358997143`) execute commands. The workflow checks this exact ID and event sender. Other human comments are normalized only. A standalone `gh>` never executes.
+1. **Trigger.** Owner edits to the first input comment (ID `6358997143`) execute commands. The workflow checks this exact ID and event sender. Other human comments are cleared and flagged as available response slots without executing. A standalone `gh>` never executes.
 2. **Parse.** The executor checks for the `gh>` prefix, removes it, and parses the remaining arguments.
 3. **Execute.** Node.js `spawnSync('gh', args)` invokes the GitHub CLI on an `ubuntu-latest` GitHub Actions runner without a shell. The workflow passes `GH_TOKEN` with `contents: read` and `issues: write` permissions.
 4. **Store full output.** The runner publishes a new comment in **[Issue #7 — Command Output Storage](https://github.com/BestNameYet/CommandLine/issues/7)**. This comment holds the command's exit code, stdout, stderr, and source comment ID. Its new GitHub comment ID is `responseCommentId`.
-5. **Publish command reference.** The runner posts a separate comment in **Issue #6** containing `originatorCommentId` (the submitted command comment ID), a copy of the command, and `responseCommentId`.
+5. **Publish command reference.** The runner overwrites an available flagged comment in **Issue #6**, or creates a response comment if no flagged slot is available. The response contains `originatorCommentId` (the submitted command comment ID), a copy of the command, and `responseCommentId`.
 6. **Reset input.** After the two publications succeed, the runner edits the originally submitted command comment so its entire body is `gh>`. The comment ID is preserved; the command is **not** deleted.
 
 ### Output comment in Issue #7
@@ -65,6 +65,10 @@ This README records the **existing implementation**; it does not prescribe addit
 
 ## Comment format enforcement
 
-The fixed first comment accepts `gh>` plus command arguments; a bare `gh>` is an idle prompt. Bot responses elsewhere are retained as written. On `created` and `edited` events in Issue #6, invalid input text and other human comment bodies are replaced with exactly `gh>` using PATCH. The comment and its ID are preserved; no comment is deleted. Bot responses are unchanged. Only owner edits to comment `6358997143` execute; a standalone `gh>` never executes. The bot-authored first prompt is authorized by the event sender. Other human comments are reset to `gh>` without executing, even if they contain command syntax. Reuse the fixed input comment for every command. The runner re-reads invalid comments before resetting them to avoid overwriting an input that has since become valid.
+The only input is first comment `6358997143`. Owner edits containing `gh>` plus arguments execute; a bare `gh>` does nothing. Invalid text in that input is reset to `gh>`. The workflow authorizes edits by event sender because the input comment is bot-authored.
+
+Other human comments are cleared to exactly `<!-- issue6-response-slot:available -->`. This hidden HTML flag renders blank and marks the comment for later overwrite. GitHub rejects a literally empty body. Bot responses are preserved. Comments and IDs are never deleted.
+
+When publishing an Issue #6 reference, the runner looks through all comment pages for the first available flagged slot, excluding the input ID. It overwrites that slot with the response and keeps the slot's comment ID. If no slot exists, it creates a new response comment. Full output remains in Issue #7.
 
 Run the focused regression checks with `node --test tests/issue6-gh-command.test.cjs`.

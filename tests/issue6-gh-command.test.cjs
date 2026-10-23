@@ -4,16 +4,18 @@ const vm = require('node:vm');
 const { test } = require('node:test');
 const source = fs.readFileSync(require('node:path').join(__dirname, '..', 'runtime/issue6-gh-command.cjs'), 'utf8');
 
-function run({ body = 'ordinary text', action = 'created', login = 'owner', type = 'User', sender = login, number = 6, id = 123, currentBody = body, failPatch = false } = {}) {
+const slotMarker = '<!-- issue6-response-slot:available -->';
+function run({ body = 'ordinary text', action = 'created', login = 'owner', type = 'User', sender = login, number = 6, id = 123, currentBody = body, failPatch = false, availableSlots = [] } = {}) {
   const event = { action, sender: { login: sender }, repository: { full_name: 'owner/repo', owner: { login: 'owner' } }, issue: { number }, comment: { id, body, user: { login, type } } };
   const calls = [];
   const exit = Symbol('exit');
   let exitCode = 0;
   const spawnSync = (exe, args) => {
     calls.push(Array.from(args));
-    if (args.includes('PATCH')) return { status: failPatch ? 1 : 0, stdout: '', stderr: failPatch ? 'forbidden' : '' };
+    if (args.includes('PATCH')) return { status: failPatch ? 1 : 0, stdout: args.includes('--jq') ? args[1].split('/').pop() : '', stderr: failPatch ? 'forbidden' : '' };
     if (args.includes('POST')) return { status: 0, stdout: String(1000 + calls.length), stderr: '' };
     if (args[0] === 'api' && args[1] === `repos/owner/repo/issues/comments/${id}`) return { status: 0, stdout: JSON.stringify({ body: currentBody, user: { type } }), stderr: '' };
+    if (args[0] === 'api' && args[1] === 'repos/owner/repo/issues/6/comments?per_page=100') return { status: 0, stdout: availableSlots.join('\n'), stderr: '' };
     return { status: 0, stdout: 'command output', stderr: '' };
   };
   const fakeFs = { readFileSync: () => JSON.stringify(event), mkdtempSync: () => '/tmp/test-response', writeFileSync: () => {}, rmSync: () => {} };
@@ -51,7 +53,16 @@ test('visitor cannot execute by editing a bot-authored prompt', () => assert.equ
 for (const action of ['created', 'edited']) test(`commands in another comment never execute (${action})`, () => {
   const result = run({ action, id: 124, body: 'gh> issue list' });
   assert.equal(posts(result).length, 0);
-  assert.deepEqual(patches(result), [['api', 'repos/owner/repo/issues/comments/124', '--method', 'PATCH', '-f', 'body=gh>']]);
+  assert.deepEqual(patches(result), [['api', 'repos/owner/repo/issues/comments/124', '--method', 'PATCH', '-f', `body=${slotMarker}`]]);
+});
+test('an already flagged comment is left blank without another write', () => assert.equal(patches(run({ id: 124, body: slotMarker })).length, 0));
+test('reference response overwrites a flagged slot before creating another comment', () => {
+  const result = run({ action: 'edited', body: 'gh> issue list', availableSlots: [124, 125] });
+  assert.equal(posts(result).length, 1);
+  const reference = patches(result).find(args => args[1] === 'repos/owner/repo/issues/comments/124');
+  assert.ok(reference);
+  assert.ok(reference.includes('--input'));
+  assert.equal(patches(result).some(args => args[1].endsWith('/125')), false);
 });
 test('invalid text in the bot-authored input is reset on owner edit', () => assert.equal(patches(run({ action: 'edited', login: 'github-actions[bot]', type: 'Bot', sender: 'owner' })).length, 1));
 test('another human cannot execute', () => assert.equal(run({ login: 'visitor', body: 'gh> issue list' }).calls.length, 0));

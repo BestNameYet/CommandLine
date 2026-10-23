@@ -28,7 +28,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node runtime/issue6-gh-command.cjs
-      - name: Reset other human comments without executing them
+      - name: Clear other human comments and flag response slots
         if: format('{0}', github.event.comment.id) != env.ISSUE6_INPUT_COMMENT_ID && github.event.comment.user.type != 'Bot'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -16,6 +16,7 @@ const owner = event.repository?.owner?.login;
 const inputCommentId = process.env.ISSUE6_INPUT_COMMENT_ID;
 if (!/^\d+$/.test(inputCommentId || '')) throw Error('ISSUE6_INPUT_COMMENT_ID is required');
 const isInput = String(original.id) === inputCommentId;
+const responseSlotMarker = '<!-- issue6-response-slot:available -->';
 // The reusable first prompt is bot-authored; authorize its owner's edits by sender.
 if (original?.user?.type === 'Bot' && !(event.action === 'edited' &&
     isInput && actor === owner)) process.exit(0);
@@ -58,7 +59,7 @@ function safe(value) {
 const source = String(original.body || '').trim();
 function resetPrompt() {
   const updated = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id,
-    '--method', 'PATCH', '-f', 'body=gh>']);
+    '--method', 'PATCH', '-f', 'body=' + (isInput ? 'gh>' : responseSlotMarker)]);
   if (updated.code !== 0) throw Error('Prompt update failed: ' + safe(updated.stderr));
 }
 if (!isInput || !/^gh>(?:\s|$)/.test(source)) {
@@ -66,7 +67,7 @@ if (!isInput || !/^gh>(?:\s|$)/.test(source)) {
   const current = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id]);
   if (current.code !== 0) throw Error('Comment read failed: ' + safe(current.stderr));
   const comment = JSON.parse(current.stdout);
-  if ((comment.user?.type !== 'Bot' || (isInput && actor === owner)) &&
+  if (comment.body !== responseSlotMarker && (comment.user?.type !== 'Bot' || (isInput && actor === owner)) &&
       (!isInput || !/^gh>(?:\s|$)/.test(String(comment.body || '').trim()))) resetPrompt();
   process.exit(0);
 }
@@ -89,8 +90,22 @@ function publish(body, issueNumber) {
   try {
     const file = path.join(dir, 'body.json');
     fs.writeFileSync(file, JSON.stringify({ body }));
-    const response = gh(['api', 'repos/' + repo + '/issues/' + issueNumber + '/comments',
-      '--method', 'POST', '--input', file, '--jq', '.id']);
+    let destination = 'repos/' + repo + '/issues/' + issueNumber + '/comments';
+    let method = 'POST';
+    if (issueNumber === 6) {
+      const slots = gh(['api', destination + '?per_page=100', '--paginate', '--jq',
+        '.[] | select(.id != ' + inputCommentId + ' and .body == "' + responseSlotMarker + '") | .id']);
+      if (slots.code !== 0) throw Error('Response slot lookup failed: ' + safe(slots.stderr));
+      const available = slots.stdout.trim().split(/\s+/).filter(Boolean);
+      if (available.length) {
+        const slotId = Number(available[0]);
+        if (!Number.isSafeInteger(slotId) || slotId < 1 || String(slotId) === inputCommentId) throw Error('Invalid response slot ID');
+        destination = 'repos/' + repo + '/issues/comments/' + slotId;
+        method = 'PATCH';
+      }
+    }
+    const response = gh(['api', destination,
+      '--method', method, '--input', file, '--jq', '.id']);
     if (response.code !== 0) throw Error('Result publication failed: ' + safe(response.stderr));
     const id = Number(response.stdout.trim());
     if (!Number.isSafeInteger(id) || id < 1) throw Error('Invalid result comment ID');

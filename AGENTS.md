@@ -14,7 +14,7 @@ To execute a requested `gh` command, edit only the first input comment on Issue 
 gh> issue view 6 --repo BestNameYet/CommandLine --json number,title
 ```
 
-Only owner edits to that fixed input comment can execute commands. The workflow gates execution on its ID and the event sender, because the first prompt is bot-authored. A standalone `gh>` never executes. Other human comments are reset to `gh>` without executing; bot responses remain unchanged. Reuse the same input comment for every command.
+Only owner edits to that fixed input comment can execute commands. The workflow gates execution on its ID and the event sender, because the first prompt is bot-authored. A standalone `gh>` never executes. Other human comments are cleared to a hidden `<!-- issue6-response-slot:available -->` flag without executing; they render blank and are reused for later response references. Bot responses remain unchanged. Reuse the same input comment for every command.
 
 The runner publishes complete stdout, stderr, and exit status to a comment in [Issue #7](https://github.com/BestNameYet/CommandLine/issues/7). In Issue #6 it publishes a separate comment containing the original command and `responseCommentId`, which identifies the output comment. The submitted command comment is edited back to `gh>` after both publications succeed.
 
