@@ -1,5 +1,7 @@
 name: Run JavaScript Container
 on:
+  issue_comment:
+    types: [created, edited]
   workflow_dispatch:
     inputs:
       source:
@@ -78,7 +80,27 @@ on:
 
 permissions: {}
 jobs:
+  update-comment-manifest:
+    if: github.event_name == 'issue_comment' && contains(fromJSON('[3,4,5]'), github.event.issue.number)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    concurrency:
+      group: issue-manifest-${{ github.event.issue.number }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Rebuild manifest in issue description
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node runtime/update-issue-manifest.cjs
+
   execute:
+    if: github.event_name != 'issue_comment'
     runs-on: ubuntu-latest
     timeout-minutes: ${{ fromJSON(inputs.job_timeout_minutes) }}
     container:
