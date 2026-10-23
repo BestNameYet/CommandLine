@@ -79,6 +79,7 @@ function publish(body, issueNumber) {
 }
 const outputCommentId = publish(output, 7);
 const referenceCommentId = publish(JSON.stringify({
+  originatorCommentId: original.id,
   command: source,
   responseCommentId: outputCommentId
 }, null, 2), 6);
