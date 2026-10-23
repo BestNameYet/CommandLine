@@ -67,6 +67,7 @@ if (!isInput || !/^gh>(?:\s|$)/.test(source)) {
   const current = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id]);
   if (current.code !== 0) throw Error('Comment read failed: ' + safe(current.stderr));
   const comment = JSON.parse(current.stdout);
+  if (comment.body !== original.body) process.exit(0);
   if (comment.body !== responseSlotMarker && (comment.user?.type !== 'Bot' || (isInput && actor === owner)) &&
       (!isInput || !/^gh>(?:\s|$)/.test(String(comment.body || '').trim()))) resetPrompt();
   process.exit(0);

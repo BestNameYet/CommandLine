@@ -4,10 +4,10 @@
       "description": "Fixed-input command runtime with hidden blank-slot flags and reuse of flagged comments for Issue 6 responses."
     },
     "tests/issue6-gh-command.test.cjs": {
-      "description": "Twenty regression tests covering input gating, edits, blank slot flags, response slot reuse, and publication."
+      "description": "Twenty-one regression tests covering input gating, blank response slots, reuse, stale-event protection, and publication."
     },
     ".github/workflows/issue-6-gh.yml": {
-      "description": "Executes only owner edits of input 6358997143; clears other human comments into reusable response slots."
+      "description": "Executes only owner edits of input 6358997143; clears other human comments into reusable response slots with per-comment concurrency."
     },
     "docs/issue-6/README.md": {
       "description": "Issue 6 protocol, format enforcement, and regression test command."

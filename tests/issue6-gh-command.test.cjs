@@ -56,6 +56,7 @@ for (const action of ['created', 'edited']) test(`commands in another comment ne
   assert.deepEqual(patches(result), [['api', 'repos/owner/repo/issues/comments/124', '--method', 'PATCH', '-f', `body=${slotMarker}`]]);
 });
 test('an already flagged comment is left blank without another write', () => assert.equal(patches(run({ id: 124, body: slotMarker })).length, 0));
+test('stale normalization event cannot clear a slot already filled with a response', () => assert.equal(patches(run({ id: 124, body: slotMarker, currentBody: '{"originatorCommentId":123,"responseCommentId":1001}' })).length, 0));
 test('reference response overwrites a flagged slot before creating another comment', () => {
   const result = run({ action: 'edited', body: 'gh> issue list', availableSlots: [124, 125] });
   assert.equal(posts(result).length, 1);

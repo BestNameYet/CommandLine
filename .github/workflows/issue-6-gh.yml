@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     concurrency:
-      group: issue-6-gh-commands
+      group: issue-6-gh-${{ github.event.comment.id }}
       cancel-in-progress: false
     permissions:
       contents: read
