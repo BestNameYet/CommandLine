@@ -62,12 +62,12 @@ const output = JSON.stringify({
   stderr: safe(result.stderr)
 }, null, 2);
 
-function publish(body) {
+function publish(body, issueNumber) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'issue6-response-'));
   try {
     const file = path.join(dir, 'body.json');
     fs.writeFileSync(file, JSON.stringify({ body }));
-    const response = gh(['api', 'repos/' + repo + '/issues/6/comments',
+    const response = gh(['api', 'repos/' + repo + '/issues/' + issueNumber + '/comments',
       '--method', 'POST', '--input', file, '--jq', '.id']);
     if (response.code !== 0) throw Error('Result publication failed: ' + safe(response.stderr));
     const id = Number(response.stdout.trim());
@@ -77,11 +77,11 @@ function publish(body) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 }
-const outputCommentId = publish(output);
+const outputCommentId = publish(output, 7);
 const referenceCommentId = publish(JSON.stringify({
   command: source,
   responseCommentId: outputCommentId
-}, null, 2));
+}, null, 2), 6);
 const updated = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id,
   '--method', 'PATCH', '-f', 'body=gh>']);
 if (updated.code !== 0) throw Error('Prompt update failed: ' + safe(updated.stderr));
