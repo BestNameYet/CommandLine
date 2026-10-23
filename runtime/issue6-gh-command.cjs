@@ -29,8 +29,8 @@ function argsFrom(input) {
   if (quote || escape) throw Error('Unmatched quote or escape');
   if (active) result.push(word);
   if (result[0] === 'gh') result.shift();
-  if (!result.length || ['auth', 'alias', 'extension', 'config'].includes(result[0])) {
-    throw Error('Invalid or restricted gh command');
+  if (!result.length || result[0] === 'gh') {
+    throw Error('Expected gh arguments without repeating gh');
   }
   return result;
 }
@@ -45,7 +45,7 @@ function gh(args) {
 function safe(value) {
   let s = String(value);
   s = s.replaceAll(process.env.GH_TOKEN, '[REDACTED]');
-  return s.length > 24000 ? s.slice(0, 24000) + '\n[TRUNCATED]' : s;
+  return s;
 }
 
 const source = String(original.body || '').trim();
@@ -57,19 +57,25 @@ catch (e) { result = { code: 1, stdout: '', stderr: e.message }; }
 const output = JSON.stringify({
   type: 'gh-command-result',
   sourceCommentId: original.id,
-  command: safe(source),
   exitCode: result.code,
   stdout: safe(result.stdout),
   stderr: safe(result.stderr)
 }, null, 2);
 
 function publish(body) {
-  const response = gh(['api', 'repos/' + repo + '/issues/6/comments',
-    '--method', 'POST', '-f', 'body=' + body, '--jq', '.id']);
-  if (response.code !== 0) throw Error('Result publication failed: ' + safe(response.stderr));
-  const id = Number(response.stdout.trim());
-  if (!Number.isSafeInteger(id) || id < 1) throw Error('Invalid result comment ID');
-  return id;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'issue6-response-'));
+  try {
+    const file = path.join(dir, 'body.json');
+    fs.writeFileSync(file, JSON.stringify({ body }));
+    const response = gh(['api', 'repos/' + repo + '/issues/6/comments',
+      '--method', 'POST', '--input', file, '--jq', '.id']);
+    if (response.code !== 0) throw Error('Result publication failed: ' + safe(response.stderr));
+    const id = Number(response.stdout.trim());
+    if (!Number.isSafeInteger(id) || id < 1) throw Error('Invalid result comment ID');
+    return id;
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 }
 const outputCommentId = publish(output);
 const referenceCommentId = publish(JSON.stringify({
@@ -79,7 +85,5 @@ const referenceCommentId = publish(JSON.stringify({
 const removed = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id,
   '--method', 'DELETE']);
 if (removed.code !== 0) throw Error('Reference published but input cleanup failed');
-try { publish('gh>'); }
-catch (error) { console.error('Prompt publication failed: ' + error.message); }
 console.log(JSON.stringify({ responseCommentId: outputCommentId,
   referenceCommentId, sourceCommentId: original.id }));
