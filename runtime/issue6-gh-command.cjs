@@ -82,8 +82,8 @@ const referenceCommentId = publish(JSON.stringify({
   command: source,
   responseCommentId: outputCommentId
 }, null, 2));
-const removed = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id,
-  '--method', 'DELETE']);
-if (removed.code !== 0) throw Error('Reference published but input cleanup failed');
+const updated = gh(['api', 'repos/' + repo + '/issues/comments/' + original.id,
+  '--method', 'PATCH', '-f', 'body=gh>']);
+if (updated.code !== 0) throw Error('Prompt update failed: ' + safe(updated.stderr));
 console.log(JSON.stringify({ responseCommentId: outputCommentId,
   referenceCommentId, sourceCommentId: original.id }));
