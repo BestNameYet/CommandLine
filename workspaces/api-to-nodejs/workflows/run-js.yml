@@ -1,0 +1,123 @@
+name: Run JavaScript Container
+on:
+  issue_comment:
+    types: [created, edited]
+  workflow_dispatch:
+    inputs:
+      source:
+        description: JavaScript source to execute
+        required: true
+        type: string
+      arguments:
+        description: JSON arguments
+        required: false
+        default: ''
+        type: string
+      dependencies:
+        description: JSON array of pinned npm package versions
+        required: false
+        default: ''
+        type: string
+      environment_json:
+        description: JSON object of additional string environment variables
+        required: false
+        default: ''
+        type: string
+      timeout_ms:
+        description: Optional execution timeout override (blank uses config)
+        required: false
+        default: ''
+        type: string
+      output_limit_bytes:
+        description: Optional output buffer override (blank uses config)
+        required: false
+        default: ''
+        type: string
+      job_timeout_minutes:
+        description: GitHub Actions job timeout in minutes
+        required: false
+        default: '360'
+        type: string
+      config_file:
+        description: Executor configuration file
+        required: false
+        default: config/js-executor.json
+        type: string
+      install_timeout_ms:
+        description: Optional dependency installation timeout override
+        required: false
+        default: ''
+        type: string
+  workflow_call:
+    inputs:
+      source:
+        type: string
+        required: true
+      arguments:
+        type: string
+        default: ''
+      dependencies:
+        type: string
+        default: ''
+      environment_json:
+        type: string
+        default: ''
+      timeout_ms:
+        type: string
+        default: ''
+      output_limit_bytes:
+        type: string
+        default: ''
+      job_timeout_minutes:
+        type: string
+        default: '360'
+      config_file:
+        type: string
+        default: config/js-executor.json
+      install_timeout_ms:
+        type: string
+        default: ''
+
+permissions: {}
+jobs:
+  update-comment-manifest:
+    if: github.event_name == 'issue_comment' && contains(fromJSON('[3,4,5]'), github.event.issue.number)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    concurrency:
+      group: issue-manifest-${{ github.event.issue.number }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Rebuild manifest in issue description
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+        run: node runtime/update-issue-manifest.cjs
+
+  execute:
+    if: github.event_name != 'issue_comment'
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ fromJSON(inputs.job_timeout_minutes) }}
+    container:
+      image: node:22-alpine
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Execute JavaScript in container
+        env:
+          JS_SOURCE: ${{ inputs.source }}
+          JS_ARGUMENTS: ${{ inputs.arguments }}
+          JS_DEPENDENCIES: ${{ inputs.dependencies }}
+          JS_ENV_JSON: ${{ inputs.environment_json }}
+          JS_TIMEOUT_MS: ${{ inputs.timeout_ms }}
+          JS_OUTPUT_LIMIT_BYTES: ${{ inputs.output_limit_bytes }}
+          JS_INSTALL_TIMEOUT_MS: ${{ inputs.install_timeout_ms }}
+          JS_CONFIG_FILE: ${{ inputs.config_file }}
+        run: node runtime/execute-js.cjs
