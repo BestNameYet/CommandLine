@@ -38,3 +38,14 @@ The GitHub command listener `.github/workflows/issue-6-gh.yml` invokes `runtime/
 
 For `gh> commit <commentID>`, the referenced comment must be on Issue #7 and contain a valid JSON file object (`filename` as a safe repository-relative path, `body` as a string). The adapter checks the source, path, size, target, and commit receipt. Results are written to Issue #7 and referenced on Issue #6; do not claim a commit occurred without a successful commit SHA or verified unchanged result. This routing does not authorize other unrequested mutations. See [commit adapter protocol](docs/issue-6/COMMIT_ADAPTER.md).
 
+
+## Meta-instructor output ownership
+
+For the interactive meta-instructor, the fixed Issue #6 command-input comment
+is not an output location. Each session nonce chooses its own Issue #7 output
+comment at `gh> meta start`; preserve that comment ID and append later
+results to its `outputs` by editing the **same** Issue #7 comment. Never
+share a canonical output comment across concurrent or interleaved sessions.
+The persisted session `state` is authoritative; the agent reads compact
+output requests and return schemas from its own comment's `outputs` array.
+See [meta-instructor README](workspaces/meta-instructor/README.md).
