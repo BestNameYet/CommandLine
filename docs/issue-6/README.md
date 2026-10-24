@@ -72,3 +72,8 @@ Other human comments are cleared to exactly `<!-- issue6-response-slot:available
 When publishing an Issue #6 reference, the runner looks through all comment pages for the first available flagged slot, excluding the input ID. It overwrites that slot with the response and keeps the slot's comment ID. If no slot exists, it creates a new response comment. Full output remains in Issue #7.
 
 Run the focused regression checks with `node --test tests/issue6-gh-command.test.cjs`.
+
+## Commit adapter (additional command route)
+
+The workflow `.github/workflows/issue-6-gh.yml` now preprocesses Issue #6 events with `runtime/issue6-route.cjs` and calls one reusable workflow. `.github/workflows/issue-6-standard.yml` retains the existing read-only `gh` executor and comment normalization. `.github/workflows/issue-6-commit.yml` is a separate write-enabled workflow supporting `gh> commit <commentID>`. It validates a JSON file object in Issue #7 and commits its `filename` and `body` to this repository. See [COMMIT_ADAPTER.md](COMMIT_ADAPTER.md) for the exact accepted format and safeguards.
+
