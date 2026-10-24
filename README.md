@@ -6,23 +6,35 @@
 
 **Issue #6 is only for updates to this central Issue #7 queue.** Add or revise jobs and update their progress there; do not submit the actual work itself to Issue #6. Agents read their assignments from Issue #7 and perform the assigned work using the appropriate authorized integration or runtime. This rule supersedes older direct-work submission instructions and examples below, including direct `gh> commit` and `gh> meta` submissions. Those sections describe existing runner capabilities, not permission to bypass the queue.
 
-The queue uses this JSON shape:
+The central comment stores one `return_schema` and one `jobs` array. Each job is **one record for its entire lifecycle**, with this complete form:
 
 ```json
 {
-  "type": "job-queue",
-  "jobs": [
-    {
-      "id": "job-001",
-      "description": "The work to perform",
-      "status": "pending",
-      "progress": 0
-    }
-  ]
+  "id": null,
+  "user_prompt": null,
+  "user_prompt_updates": null,
+  "user_intent": null,
+  "submission_nonce": null,
+  "status": null,
+  "progress": null,
+  "job_plan": null,
+  "job_actions": null,
+  "files": null,
+  "completion": null,
+  "additional_information": null,
+  "updated_at": null
 }
 ```
 
-Use `pending`, `in_progress`, `blocked`, or `completed` for `status`; `progress` is a completion percentage from 0 to 100. As work advances, update its existing job entry. Mark a job completed only after verifying its result. Retain completed jobs so the same comment shows the work and its final status.
+Every field stays present. Any value not yet known, populated, or completed is `null`; do not invent missing values or use placeholder claims. Use an empty array only when it is known that there are no items. The formal `return_schema` in comment `6389130786` defines the nested shapes.
+
+- **At submission:** copy the user's prompt exactly into `user_prompt`, record interpreted `user_intent` separately, and generate a `submission_nonce`. Preserve that original prompt and nonce; append later user instructions verbatim to `user_prompt_updates`.
+- **Plan and assignment:** `job_plan` is an ordered array of steps, each with `id`, `description`, `status`, `worker_nonce`, and `result`. **Assignment is per step, never per job. Any agent may complete an unfinished step that is available, and must take the next available step in plan order.** An available step is unfinished, ready to perform, and not currently being worked by another agent. A worker records a fresh nonce on the step, distinct from the submission nonce and other step assignments. Mark the step `in_progress`, finish or report its blocker, and update its result/status in the same job record. A takeover uses a new worker nonce; keep prior action/change records as history. Do not reserve every step or the entire job for one agent.
+- **Actions:** `job_actions` entries contain `id`, `plan_step_id`, `worker_nonce`, `description`, `status`, `result`, `comment_id`, `path`, and `evidence`. Associate each performed action or update with its Issue comment ID and/or repository file path. Keep unavailable references null.
+- **Files:** `files` entries contain `repository`, `path`, `operation`, `status`, and `changes`. Record files intended for creation or modification in the plan. **Immediately after each actual file creation or change, update that file entry and append a change record; do not wait until the whole job ends.** Each change records `plan_step_id`, `worker_nonce`, `description`, `changed_at`, `comment_id`, `receipt_comment_id`, `path`, `commit_sha`, `blob_sha`, and `evidence`. Include the associated comment ID and/or file path, and record hashes or receipts only when verified. All unavailable values remain null.
+- **Conclusion:** `completion` contains `summary`, `validation`, `remaining_work`, and `evidence`. Fill it when the job concludes, while retaining all steps, actions, file changes, and references in the same record. Keep other pertinent details in `additional_information` and refresh `updated_at` after each saved change.
+
+Use `pending`, `in_progress`, `blocked`, or `completed` for known job/step/action/file status; `progress` is a completion percentage from 0 to 100, or null when unknown. A completed step does not complete the entire job. Mark a job completed only after its required steps and results are verified. Retain completed jobs in the central comment.
 
 Before writing, reread the queue and preserve other jobs and their latest updates. Do not create a separate queue per agent. The central comment is the authoritative assignment and progress record; other Issue #7 comments may still hold source files, outputs, and execution receipts.
 
