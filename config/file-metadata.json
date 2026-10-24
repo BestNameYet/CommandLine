@@ -49,13 +49,13 @@
       "description": "Strict JSON schemas and transactional QA, context, plan, step-gate and final-report state machine."
     },
     "workspaces/meta-instructor/controller.test.cjs": {
-      "description": "Boundary, replay, uniqueness, blocking, context follow-up and lifecycle regression tests."
+      "description": "Controller lifecycle regression suite and per-session output append/isolation/legacy-migration tests."
     },
     "workspaces/meta-instructor/issue6-adapter.cjs": {
-      "description": "Owner-gated GitHub comment application adapter with nonce/request IDs and durable session prompts."
+      "description": "Meta application adapter selecting a distinct Issue 7 output comment per nonce and appending subsequent outputs by PATCHing that same comment."
     },
     "workspaces/meta-instructor/README.md": {
-      "description": "Application protocol, return schemas, validation limits and pending deployment status."
+      "description": "Meta protocol, state/outputs format, per-nonce output IDs, limits, verification."
     },
     "workspaces/meta-instructor/deployment.json": {
       "description": "Router, listener, and reusable workflow installation manifest for the meta-instructor."
