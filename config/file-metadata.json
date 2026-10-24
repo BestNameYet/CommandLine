@@ -7,7 +7,7 @@
       "description": "Twenty-one regression tests covering input gating, blank response slots, reuse, stale-event protection, and publication."
     },
     ".github/workflows/issue-6-gh.yml": {
-      "description": "Issue 6 listener selecting standard, commit, or meta-instructor reusable workflows. Supports owner-edited commands in the first five reserved Issue 6 comments."
+      "description": "Issue 6 listener: requires all saved workflow Git blob SHAs to match .github/workflows before regression checks or command routing; prints an error and stops on mismatch or comparison failure."
     },
     "docs/issue-6/README.md": {
       "description": "Current five-input Issue 6 console protocol, lifecycle, comment normalization, commit route, and per-session meta output."
@@ -75,9 +75,8 @@
       "sourceBlobSha": "1920dec788ed477162602084642e268f1574bfe6"
     },
     "workspaces/api-to-nodejs/workflows/issue-6-gh.yml": {
-      "description": "Exact snapshot of active workflow .github/workflows/issue-6-gh.yml; copied 2026-10-24.",
-      "source": ".github/workflows/issue-6-gh.yml",
-      "sourceBlobSha": "a1df5624dd8bdda69eb27690907b9d5523781ad9"
+      "description": "Exact saved copy of the Issue 6 listener including the mandatory workflow SHA AND gate.",
+      "source": ".github/workflows/issue-6-gh.yml"
     },
     "workspaces/api-to-nodejs/workflows/issue-6-meta.yml": {
       "description": "Exact snapshot of active workflow .github/workflows/issue-6-meta.yml; copied 2026-10-24.",
