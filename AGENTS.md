@@ -25,3 +25,10 @@ Use this documented command interface for applicable, explicitly authorized GitH
 ## Repository structure
 
 Preserve the existing `workspaces/`, `src/`, `config/`, `tests/`, `runtime/`, `docs/`, and `.github/workflows/` directories unless an approved task requires changes.
+
+## Issue #6 routing and authorized commit adapter
+
+The GitHub command listener `.github/workflows/issue-6-gh.yml` invokes `runtime/issue6-route.cjs` before execution. Ordinary CLI commands and comment normalization use `.github/workflows/issue-6-standard.yml` with `contents: read` and `issues: write`. The explicitly requested `gh> commit <commentID>` command uses `.github/workflows/issue-6-commit.yml` with `contents: write` and `issues: write`.
+
+For `gh> commit <commentID>`, the referenced comment must be on Issue #7 and contain a valid JSON file object (`filename` as a safe repository-relative path, `body` as a string). The adapter checks the source, path, size, target, and commit receipt. Results are written to Issue #7 and referenced on Issue #6; do not claim a commit occurred without a successful commit SHA or verified unchanged result. This routing does not authorize other unrequested mutations. See [commit adapter protocol](docs/issue-6/COMMIT_ADAPTER.md).
+
