@@ -3,33 +3,43 @@ on:
   issue_comment:
     types: [created, edited]
 
+# No default token privileges. The route-specific jobs request only what they need.
 permissions: {}
 
+concurrency:
+  group: issue-6-gh-${{ github.event.comment.id }}
+  cancel-in-progress: false
+
 jobs:
-  execute:
+  preprocess:
     if: ${{ github.event.issue.number == 6 && github.event.sender.type != 'Bot' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    concurrency:
-      group: issue-6-gh-${{ github.event.comment.id }}
-      cancel-in-progress: false
     permissions:
       contents: read
-      issues: write
+    outputs:
+      route: ${{ steps.route.outputs.route }}
     env:
-      # The first comment is the single reusable command input.
       ISSUE6_INPUT_COMMENT_ID: '6358997143'
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Execute only the first input comment when edited by the owner
-        if: format('{0}', github.event.comment.id) == env.ISSUE6_INPUT_COMMENT_ID && github.event.sender.login == github.repository_owner
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node runtime/issue6-gh-command.cjs
-      - name: Clear other human comments and flag response slots
-        if: format('{0}', github.event.comment.id) != env.ISSUE6_INPUT_COMMENT_ID && github.event.comment.user.type != 'Bot'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node runtime/issue6-gh-command.cjs
+      - id: route
+        name: Select exactly one command workflow
+        run: node runtime/issue6-route.cjs
+
+  read-only-command:
+    needs: preprocess
+    if: ${{ needs.preprocess.outputs.route == 'gh' || needs.preprocess.outputs.route == 'normalize' }}
+    permissions:
+      contents: read
+      issues: write
+    uses: ./.github/workflows/issue-6-standard.yml
+
+  commit:
+    needs: preprocess
+    if: ${{ needs.preprocess.outputs.route == 'commit' }}
+    permissions:
+      contents: write
+      issues: write
+    uses: ./.github/workflows/issue-6-commit.yml
