@@ -24,6 +24,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Require matching workflow SHAs
+        run: |
+          if node workspaces/api-to-nodejs/workflow-sha-and.cjs; then
+            echo "Workflow SHAs match. Continuing listener."
+          else
+            echo "::error::Workflow SHAs do not match, or the comparison failed. Listener stopped."
+            exit 1
+          fi
       - name: Verify existing console regressions and five input routes
         run: |
           node --test tests/issue6-gh-command.test.cjs tests/issue6-route.test.cjs tests/issue6-commit.test.cjs
