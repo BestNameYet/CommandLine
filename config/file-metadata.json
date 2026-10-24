@@ -7,19 +7,40 @@
       "description": "Twenty-one regression tests covering input gating, blank response slots, reuse, stale-event protection, and publication."
     },
     ".github/workflows/issue-6-gh.yml": {
-      "description": "Executes only owner edits of input 6358997143; clears other human comments into reusable response slots with per-comment concurrency."
+      "description": "Single Issue 6 listener and preprocessor; routes fixed-comment owner edits to standard or commit reusable workflows."
     },
     "docs/issue-6/README.md": {
-      "description": "Issue 6 protocol, format enforcement, and regression test command."
+      "description": "Issue 6 command protocol and routed commit adapter."
     },
     "AGENTS.md": {
-      "description": "Agent guidance for Issue 6 execution and comment normalization."
+      "description": "Agent guidance for fixed input, preprocessor, standard gh commands and commit adapter."
     },
     "README.md": {
-      "description": "Repository command line usage and edit-only format enforcement."
+      "description": "CommandLine introduction and supported read-only and write-enabled Issue 6 routes."
     },
     "config/file-metadata.json": {
-      "description": "Metadata for files changed by the Issue 6 edit-mode enforcement update."
+      "description": "Repository file metadata, including the Issue 6 commit adapter."
+    },
+    ".github/workflows/issue-6-standard.yml": {
+      "description": "Read-only reusable workflow for ordinary gh commands and normalization."
+    },
+    ".github/workflows/issue-6-commit.yml": {
+      "description": "Write-enabled reusable workflow for validated Issue 7 comment-to-file commits."
+    },
+    "runtime/issue6-route.cjs": {
+      "description": "Owner-edited Issue 6 command preprocessor and mutually exclusive route selection."
+    },
+    "runtime/issue6-commit.cjs": {
+      "description": "Validated Issue 7 JSON file object parser and GitHub Contents commit executor."
+    },
+    "tests/issue6-route.test.cjs": {
+      "description": "Tests for Issue 6 preprocessor owner, input ID, and routing gates."
+    },
+    "tests/issue6-commit.test.cjs": {
+      "description": "Tests for JSON source validation, safe paths, create/update/no-op, and receipts."
+    },
+    "docs/issue-6/COMMIT_ADAPTER.md": {
+      "description": "Commit route syntax, input JSON format, token scopes, and verification procedure."
     }
   }
 }
