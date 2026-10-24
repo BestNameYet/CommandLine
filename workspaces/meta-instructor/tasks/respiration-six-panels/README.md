@@ -1,7 +1,7 @@
 # Respiration and N2O model for six comic panels
 
 Task nonce: respiration-six-panels-20261023-01
-Status: specification for implementation and independent review, not yet accepted.
+Status: implementation specification for numerical verification and independent review.
 
 ## Intended quantities
 Six snapshots: initial end expiration, first end inspiration, second end expiration,
@@ -72,13 +72,13 @@ Pb=760 mmHg; PH2O=47 mmHg; T=310.15 K; Q=5 L/min; Hb=15 g/dL;
 initial alveolar PO2=100 mmHg and PCO2=40 mmHg; N2O initially zero;
 total end-expiratory gas volume=2.5 L including 0.15 L conducting airway;
 tidal mouth volume=0.5 L; breath period=5 s; N2O lambda=0.47.
-Mixed venous PO2=40 mmHg, PCO2=46 mmHg, N2O fraction=0 by default.
+Initial mixed venous PO2=40 mmHg, PCO2=46 mmHg, N2O fraction=0. These values evolve through the systemic store equations below.
 CO2 beta = 0.2/(5*(46-40)) L STPD/litre blood/mmHg, chosen so the initial
 CO2 transfer is 0.2 L STPD/min. This is calibration, not a published measured
 constant. The example switches inspired dry gas to N2O without oxygen, matching
 the hypothetical described in the conversation. It is not a use instruction.
 
-## Scope and acceptance
+
 This is a short, open-system gas mixing/uptake approximation with constant
 incoming venous composition. It does not simulate tissue oxygen consumption
 directly, evolving systemic blood stores, circulation delays, N2 back diffusion,
@@ -91,3 +91,54 @@ acceptance must specifically address whether this restricted model is sufficient
 for approximate lung-composition illustration, and whether the selected horizon
 and sensitivity checks make that scope acceptable. Do not use a steady-state
 or fixed metabolic extraction assumption to invent blood saturation values.
+## Systemic metabolism, storage and recirculation
+The implementation evolves body stores; it does not hold mixed venous gas fixed.
+A single mixed systemic reservoir is an approximation to the compartmental
+conservation equations in Magor-Elliott et al., not a reproduction of its full
+anatomical/delay model.
+
+Let B=5 L systemic blood, W=41 L aqueous tissue, F=14 L adipose tissue.
+These volumes are illustrative adult parameters, not measurements of the avatar.
+Let bO = 133.322*(W*2.27e-7 + F*10.78e-7) L STPD/mmHg.
+The coefficients are from Table 2 of Magor-Elliott et al.; 133.322 converts
+mmHg to Pa. Oxygen body store is X_O(Pv)=B*C_O(Pv)+bO*Pv.
+Its conservation equation is dX_O/dt = k*U_O - metabolic_O2.
+After updating the store, the monotonic nonlinear relation is inverted to obtain
+the new returning venous PO2. Default oxygen metabolism is calibrated to the
+initial lung/blood pressure difference at the chosen Q and Hb. This is about
+a resting adult value and remains constant across the short example.
+
+For CO2, bC = B*beta + 133.322*(W*1.54e-5 + F*1.05e-5).
+X_C=bC*PvCO2 and dX_C/dt=k*U_C+metabolic_CO2.
+The blood/tissue CO2 reservoir is a linear effective-buffer approximation around
+normal pH; it omits full Bohr/Haldane coupling. Production is 0.2 L STPD/min.
+
+N2O capacity is D_N = B*lambda_b + W*lambda_water + F*lambda_fat.
+X_N is gas-equivalent litres; Fv_N=X_N/D_N and dX_N/dt=U_N.
+The water/air coefficient 0.47 and lipid/air 1.4 are reported by Levitt for N2O.
+Using those for aqueous/adipose aggregate compartments is an explicit reduction,
+not a measurement of every organ partition. As N2O accumulates, Fv_N increases
+and reduces later net lung uptake. Metabolism, external inflow and external
+outflow all enter the whole-system conservation ledger.
+
+No circulation-time delay is added to this lumped model. Blood mixing and store
+dynamics are represented by the coupled state variables, not by an unchanged
+venous boundary. The independent reviewer must assess the accuracy appropriate
+to a qualitative comic with approximate gas-composition overlays.
+
+## Scope and acceptance
+The model includes conducting-airway gas, an expanding/contracting alveolar gas
+compartment, pressure-dependent blood O2 transfer, approximate buffered CO2
+transfer, continued systemic O2 consumption/CO2 production and N2O recirculation.
+It excludes V/Q heterogeneity, explicit vascular transit paths, N2 back diffusion,
+full pH/Bohr/Haldane dynamics, ventilation reflexes, airway collapse and drug
+pharmacodynamics. No SpO2 or confusion threshold is exported. Numerical and
+sensitivity checks and independent review must precede illustration acceptance.
+
+## Execution
+Node 22, no npm dependencies:
+ node --test workspaces/meta-instructor/tasks/respiration-six-panels/model.test.cjs
+ node workspaces/meta-instructor/tasks/respiration-six-panels/model.cjs
+The executable emits the six snapshots, gas balances, systemic-state information,
+sensitivity runs and a CSV representation as JSON. Task-specific GitHub workflow
+respiration-model.yml publishes exact test output and results to Issue 7.
