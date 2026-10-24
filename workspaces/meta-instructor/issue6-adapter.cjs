@@ -18,8 +18,8 @@ async function comments(repo,issue) {
  throw Error('Comment pagination limit exceeded');
 }
 function parseCommand(body) {
- const m=/^gh>\s+meta\s+(start|respond|status)\s+([A-Za-z0-9][A-Za-z0-9_-]{0,79})(?:\s+([1-9][0-9]*))?\s*$/.exec(body);
- if(!m||((m[1]==='status')===Boolean(m[3])))throw Error('Use gh> meta start NONCE TASK_COMMENT_ID, gh> meta respond NONCE RESPONSE_COMMENT_ID, or gh> meta status NONCE');
+ const m=/^gh>\s+meta\s+(start|respond|status|action|pause|resume|revise)\s+([A-Za-z0-9][A-Za-z0-9_-]{0,79})(?:\s+([1-9][0-9]*))?\s*$/.exec(body);
+ if(!m||(['start','respond','action','revise'].includes(m[1])!==Boolean(m[3])))throw Error('Use gh> meta start/respond/action/revise NONCE COMMENT_ID or gh> meta status/pause/resume NONCE');
  return {action:m[1],nonce:m[2],commentId:m[3]};
 }
 function decodeComment(c,repo) {
@@ -31,6 +31,46 @@ function decodeComment(c,repo) {
   data=JSON.parse(data.stdout);
  }
  return data;
+}
+
+function exactArgs(args,allowed) {
+ if(!args||typeof args!=='object'||Array.isArray(args)||
+  Object.keys(args).some(k=>!allowed.includes(k))||
+  allowed.some(k=>!Object.hasOwn(args,k)))throw Error('Invalid action arguments; expected '+allowed.join(','));
+}
+function natural(n){
+ return Number.isSafeInteger(n)&&n>0;
+}
+async function executeMediated(repo,operation,args) {
+ if(operation==='issue.read'){
+  exactArgs(args,['issueNumber']);
+  if(!natural(args.issueNumber))throw Error('Invalid issue number');
+  const x=await api(repo,'issues/'+args.issueNumber);
+  return {reference:x.html_url,result:{number:x.number,title:x.title,body:x.body,url:x.html_url}};
+ }
+ if(operation==='comment.read'){
+  exactArgs(args,['commentId']);
+  if(!natural(args.commentId))throw Error('Invalid comment ID');
+  const x=await api(repo,'issues/comments/'+args.commentId);
+  return {reference:x.html_url,result:{id:x.id,body:x.body,url:x.html_url}};
+ }
+ if(operation==='repository.read'){
+  exactArgs(args,['path']);
+  if(typeof args.path!=='string'||args.path.length>1000||
+     !args.path.split('/').every(x=>x&&x!=='.'&&x!=='..'&&/^[A-Za-z0-9._-]+$/.test(x)))
+    throw Error('Invalid repository-relative file path');
+  const x=await api(repo,'contents/'+args.path.split('/').map(encodeURIComponent).join('/'));
+  if(x.type!=='file'||x.encoding!=='base64')throw Error('Only ordinary repository files supported');
+  return {reference:x.html_url,result:{path:x.path,sha:x.sha,text:Buffer.from(x.content,'base64').toString('utf8')}};
+ }
+ if(operation==='issue.comment'){
+  exactArgs(args,['issueNumber','body']);
+  if(args.issueNumber!==7)throw Error('Mediated writes are scoped to Issue #7; Issue #6 input is reserved');
+  if(typeof args.body!=='string'||!args.body.trim())throw Error('Empty issue comment');
+  const x=await api(repo,'issues/7/comments','POST',{body:args.body});
+  return {reference:x.html_url,result:{id:x.id,url:x.html_url}};
+ }
+ throw Error('Unsupported managed operation');
 }
 function compactRequest(request) {
  const {context, ...output}=request;
@@ -78,11 +118,28 @@ async function main() {
      const response=decodeComment(await api(repo,'issues/comments/'+cmd.commentId),repo);
      state=core.advance(state,response);
     }catch(e){errors=[e.message];}
+   }else if(cmd.action==='pause'||cmd.action==='resume'){
+    try{state=cmd.action==='pause'?core.pause(state):core.resume(state);}
+    catch(e){errors=[e.message];}
+   }else if(cmd.action==='revise'){
+    try{state=core.revise(state,decodeComment(await api(repo,'issues/comments/'+cmd.commentId),repo));}
+    catch(e){errors=[e.message];}
+   }else if(cmd.action==='action'){
+    try{
+     const spec=decodeComment(await api(repo,'issues/comments/'+cmd.commentId),repo);
+     core.assertAction(state,spec); // Must precede ALL execution side effects.
+     let outcome;
+     try{
+      outcome={success:true,...await executeMediated(repo,spec.operation,spec.args)};
+     }catch(e){outcome={success:false,error:e.message};errors=[e.message];}
+     const recorded=core.recordAction(state,spec,outcome,cmd.commentId);
+     state=recorded.state;
+    }catch(e){errors=[e.message];}
    }
   }
   const next=core.request(state);
   receipt={type:'meta-instructor-result',nonce:cmd.nonce,exitCode:errors.length?1:0,
-   status:errors.length?'validation-failed':state.phase==='complete'?'complete':'awaiting-agent',
+   status:errors.length?'validation-failed':state.phase==='complete'?'complete':state.gate==='awaiting-report'&&state.phase==='execute'?'awaiting-step-report':'awaiting-agent',
    errors,request:next};
   const body=JSON.stringify(appendOutput(previous,cmd.nonce,state,receipt),null,2);
   // Each nonce selects its own Issue 7 output on start and edits that same ID thereafter.
@@ -116,4 +173,4 @@ async function main() {
  console.log(JSON.stringify({responseCommentId:outputCommentId,exitCode:receipt.exitCode,status:receipt.status}));
 }
 if(require.main===module)main().catch(e=>{console.error(e.message);process.exitCode=1;});
-module.exports={parseCommand,decodeComment,compactRequest,appendOutput};
+module.exports={parseCommand,decodeComment,compactRequest,appendOutput,executeMediated,exactArgs};
