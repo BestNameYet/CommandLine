@@ -1,0 +1,26 @@
+name: Issue 6 Meta Instructor
+on:
+  workflow_call:
+permissions: {}
+jobs:
+  interact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    env:
+      ISSUE6_INPUT_COMMENT_ID: ${{ contains(fromJSON('[6358997143,6358997306,6359048816,6359050701,6359050871]'), github.event.comment.id) && github.event.comment.id || '6358997143' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify controller and existing console regressions
+        run: node --test workspaces/meta-instructor/controller.test.cjs tests/issue6-gh-command.test.cjs tests/issue6-route.test.cjs tests/issue6-commit.test.cjs
+      - name: Advance the interactive application
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node workspaces/meta-instructor/issue6-adapter.cjs
