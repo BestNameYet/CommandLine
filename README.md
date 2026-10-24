@@ -1,5 +1,42 @@
 # CommandLine
 
+## Central job queue — required
+
+**All agents receive their jobs from the single [Issue #7 job-queue comment](https://github.com/BestNameYet/CommandLine/issues/7#issuecomment-6389130786) (comment ID `6389130786`).** Read that exact comment before selecting or resuming work. Keep all jobs and their completion statuses in its JSON `jobs` array; update the same comment throughout each job.
+
+**Issue #6 is only for updates to this central Issue #7 queue.** Add or revise jobs and update their progress there; do not submit the actual work itself to Issue #6. Agents read their assignments from Issue #7 and perform the assigned work using the appropriate authorized integration or runtime. This rule supersedes older direct-work submission instructions and examples below, including direct `gh> commit` and `gh> meta` submissions. Those sections describe existing runner capabilities, not permission to bypass the queue.
+
+The queue uses this JSON shape:
+
+```json
+{
+  "type": "job-queue",
+  "jobs": [
+    {
+      "id": "job-001",
+      "description": "The work to perform",
+      "status": "pending",
+      "progress": 0
+    }
+  ]
+}
+```
+
+Use `pending`, `in_progress`, `blocked`, or `completed` for `status`; `progress` is a completion percentage from 0 to 100. As work advances, update its existing job entry. Mark a job completed only after verifying its result. Retain completed jobs so the same comment shows the work and its final status.
+
+Before writing, reread the queue and preserve other jobs and their latest updates. Do not create a separate queue per agent. The central comment is the authoritative assignment and progress record; other Issue #7 comments may still hold source files, outputs, and execution receipts.
+
+To update the queue through an idle reserved Issue #6 input, use the existing GitHub CLI transport:
+
+```text
+gh> api repos/BestNameYet/CommandLine/issues/comments/6389130786 --method PATCH -f 'body=<complete updated queue JSON>'
+```
+
+Replace the placeholder with the complete JSON record using the CLI's supported quoting. Inspect the execution receipt, then read comment `6389130786` back to verify the saved queue. A submitted update alone is not a completed update.
+
+The queue is an agent procedure backed by a persistent comment. The current listener has not yet been changed to enforce queue-only submissions or automatically assign jobs. Workflow integration requirements and matching workflow SHAs still apply to jobs that modify workflows.
+
+
 ## Five reserved input comments
 
 Edit any of the following five comments on [Issue #6](https://github.com/BestNameYet/CommandLine/issues/6) to submit a command:
