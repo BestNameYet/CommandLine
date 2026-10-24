@@ -105,6 +105,10 @@
     },
     "workspaces/api-to-nodejs/workflow-sha-and.cjs": {
       "description": "Node.js Git blob SHA comparison table for workspace workflow copies and .github/workflows, per-file booleans, cumulative AND and overall result; no API dependency."
+    },
+    "workspaces/api-to-nodejs/diagnostics/issue-1-comments-2026-10-24-export.cjs": {
+      "description": "Self-extracting, lossless LZW-compressed JSON snapshot of the full GitHub Issue #1 comment collection for diagnostic analysis.",
+      "category": "diagnostic"
     }
   }
 }
