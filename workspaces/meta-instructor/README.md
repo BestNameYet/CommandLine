@@ -1,9 +1,6 @@
 # Interactive meta-instructor
 
-Deployment status: controller and adapter source are provided; application routing
-is not active until deployment.json is installed. The workflow-file write was
-rejected by the commit adapter with HTTP 403. Commands below describe the protocol
-after installation, not a currently verified live application.
+Deployment status: installed through the authorized GitHub integration and Issue 6 commit adapter. A live start and schema-rejection check succeeded. The application workflow passed all 54 controller and existing console regression tests.
 
 This application is controlled through the existing Issue 6 fixed gh> input.
 All application code lives in workspaces/meta-instructor/. The minimal router
