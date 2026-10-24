@@ -22,3 +22,10 @@ Read [AGENTS.md](AGENTS.md) and applicable workspace instructions before reposit
 
 - [Issue #6 GitHub CLI console](docs/issue-6/README.md) — command submission, response comments, and output storage.
 - [GitHub Actions runtime and hosted-runner limits](docs/GITHUB_ACTIONS_RUNTIME_LIMITS.md) — exact documented ceilings, runner hardware, and configuration distinctions for the JavaScript container.
+
+## Commit adapter
+
+The Issue #6 listener uses `runtime/issue6-route.cjs` to select one reusable workflow. Ordinary `gh>` commands use `.github/workflows/issue-6-standard.yml` (`contents: read`, `issues: write`). The explicit `gh> commit <commentID>` command uses `.github/workflows/issue-6-commit.yml` (`contents: write`, `issues: write`).
+
+The commit command reads an Issue #7 comment containing a JSON object with `filename` (repository-relative path) and `body` (string file contents), validates it, and creates or updates that file in `CommandLine`. Successful and failed results are published to Issue #7; the reference is placed in Issue #6 and the fixed prompt is reset. See [the commit protocol](docs/issue-6/COMMIT_ADAPTER.md).
+
