@@ -35,3 +35,13 @@ The Issue #6 listener uses `runtime/issue6-route.cjs` to select one reusable wor
 
 The commit command reads an Issue #7 comment containing a JSON object with `filename` (repository-relative path) and `body` (string file contents), validates it, and creates or updates that file in `CommandLine`. Successful and failed results are published to Issue #7; the reference is placed in Issue #6 and the fixed prompt is reset. See [the commit protocol](docs/issue-6/COMMIT_ADAPTER.md).
 
+
+## Meta-instructor output IDs
+
+The meta-instructor in [workspaces/meta-instructor/](workspaces/meta-instructor/README.md)
+uses the fixed Issue #6 prompt for commands, but **selects a separate Issue #7
+output comment per session nonce**. The ID created at `meta start` is reused
+for subsequent `meta respond` and `meta status` calls: results are appended
+to that session comment's `outputs` array by editing the same comment ID.
+No global meta output comment ID is canonical. The session's `state` is
+stored once; appended outputs omit duplicated context.
