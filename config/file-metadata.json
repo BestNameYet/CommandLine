@@ -7,19 +7,19 @@
       "description": "Twenty-one regression tests covering input gating, blank response slots, reuse, stale-event protection, and publication."
     },
     ".github/workflows/issue-6-gh.yml": {
-      "description": "Single Issue 6 listener and preprocessor; routes fixed-comment owner edits to standard or commit reusable workflows."
+      "description": "Issue 6 listener selecting standard, commit, or meta-instructor reusable workflows."
     },
     "docs/issue-6/README.md": {
-      "description": "Issue 6 console procedure, routing, comment protocol, and integration-only workflow editing rule."
+      "description": "Issue 6 command protocol and routed commit adapter."
     },
     "AGENTS.md": {
-      "description": "Canonical agent instructions; requires connected GitHub integration for .github/workflows/ changes; specifies Issue 6 console and commit adapter."
+      "description": "Agent guidance for fixed input, preprocessor, standard gh commands and commit adapter."
     },
     "README.md": {
-      "description": "Canonical repository overview and mandatory GitHub integration exception for workflow edits."
+      "description": "CommandLine introduction and supported read-only and write-enabled Issue 6 routes."
     },
     "config/file-metadata.json": {
-      "description": "Registry of documented repository files and canonical workflow-editing instructions."
+      "description": "Repository file metadata, including the Issue 6 commit adapter."
     },
     ".github/workflows/issue-6-standard.yml": {
       "description": "Read-only reusable workflow for ordinary gh commands and normalization."
@@ -28,7 +28,7 @@
       "description": "Write-enabled reusable workflow for validated Issue 7 comment-to-file commits."
     },
     "runtime/issue6-route.cjs": {
-      "description": "Owner-edited Issue 6 command preprocessor and mutually exclusive route selection."
+      "description": "Owner-edited fixed-input preprocessor routing mutually exclusive gh, commit, and meta application commands."
     },
     "runtime/issue6-commit.cjs": {
       "description": "Validated Issue 7 JSON file object parser and GitHub Contents commit executor."
@@ -40,7 +40,31 @@
       "description": "Tests for JSON source validation, safe paths, create/update/no-op, and receipts."
     },
     "docs/issue-6/COMMIT_ADAPTER.md": {
-      "description": "Issue 7 file-object commit protocol; workflow-file writes must use GitHub integration."
+      "description": "Commit route syntax, input JSON format, token scopes, and verification procedure."
+    },
+    "workspaces/meta-instructor/PLAN.md": {
+      "description": "Implementation plan for the interactive Issue 6 meta-instructor."
+    },
+    "workspaces/meta-instructor/controller.cjs": {
+      "description": "Strict JSON schemas and transactional QA, context, plan, step-gate and final-report state machine."
+    },
+    "workspaces/meta-instructor/controller.test.cjs": {
+      "description": "Boundary, replay, uniqueness, blocking, context follow-up and lifecycle regression tests."
+    },
+    "workspaces/meta-instructor/issue6-adapter.cjs": {
+      "description": "Owner-gated GitHub comment application adapter with nonce/request IDs and durable session prompts."
+    },
+    "workspaces/meta-instructor/README.md": {
+      "description": "Application protocol, return schemas, validation limits and pending deployment status."
+    },
+    "workspaces/meta-instructor/deployment.json": {
+      "description": "Router, listener, and reusable workflow installation manifest for the meta-instructor."
+    },
+    ".github/workflows/issue-6-meta.yml": {
+      "description": "Read-only-content/issues-write meta-instructor workflow running controller and console regressions before application transitions."
+    },
+    "workspaces/meta-instructor/VERIFICATION.md": {
+      "description": "Exact workflow test counts, live smoke-test receipts, and verification limits for the meta-instructor."
     }
   }
 }
