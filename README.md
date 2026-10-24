@@ -1,5 +1,10 @@
 # CommandLine
 
+## Five reserved input comments
+
+The first five comments on Issue #6 are command inputs: `6358997143`, `6358997306`, `6359048816`, `6359050701`, and `6359050871`. Owner edits to any of these comments beginning with `gh>` plus arguments execute through the existing listener and route-specific workflow. Each workflow selects the originating ID only if it belongs to this fixed set; otherwise the original first ID remains selected for normalization. A bare `gh>` does not execute. Successful commands reset their own input to `gh>`. Full output remains in Issue #7, with originator and response IDs referenced in Issue #6. These five comments are reserved for input, not response-slot reuse. Statements below describing only one input refer to the earlier arrangement and are superseded by this section.
+
+
 ## Workflow changes: mandatory GitHub integration
 
 **Required exception to the Issue #6 command-line rule:** For any creation, modification, replacement, or deletion of files under `.github/workflows/`, use the connected **GitHub integration** directly. **Do not use `gh>`, `gh> commit <commentID>`, or the Issue #6 commit workflow to change workflow files.** The Issue #6 runtime token is not a substitute for an integration credential authorized to update GitHub Actions workflows.
@@ -10,7 +15,7 @@ Read the current workflow and related repository instructions first; perform the
 
 **[Issue #6 — GitHub CLI command console](https://github.com/BestNameYet/CommandLine/issues/6)** is the repository's authorized command-line interface for GitHub CLI operations. Use this console for requested `gh` commands rather than bypassing it with direct GitHub API calls.
 
-Edit only the [first input comment on Issue #6](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6358997143) (ID `6358997143`) containing the `gh>` prompt followed by GitHub CLI arguments (do **not** repeat `gh`):
+Edit any of the first five input comments on Issue #6 containing the `gh>` prompt followed by GitHub CLI arguments (do **not** repeat `gh`):
 
 ```text
 gh> issue view 6 --repo BestNameYet/CommandLine --json number,title
