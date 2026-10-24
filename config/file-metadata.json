@@ -13,10 +13,10 @@
       "description": "Current five-input Issue 6 console protocol, lifecycle, comment normalization, commit route, and per-session meta output."
     },
     "AGENTS.md": {
-      "description": "Agent instructions for five reserved Issue 6 input IDs, owner-only submission, result correlation, reuse, and authorized command routes. Requires candidate-first workflow commits through Issue 6 to workspaces/api-to-nodejs/workflows, followed by a GitHub integration content copy into .github/workflows and verified matching Git blob SHAs."
+      "description": "Agent instructions establishing central Issue 7 job queue comment 6389130786, shared JSON jobs and progress, queue-only Issue 6 submissions, and precedence over legacy direct-work commands."
     },
     "README.md": {
-      "description": "CommandLine overview with direct links to all five reserved inputs, submission and reset behavior, and output locations. Requires candidate-first workflow commits through Issue 6 to workspaces/api-to-nodejs/workflows, followed by a GitHub integration content copy into .github/workflows and verified matching Git blob SHAs."
+      "description": "Repository overview requiring all agents to receive jobs and update completion progress in central Issue 7 queue comment 6389130786, with Issue 6 reserved for queue updates and existing workflow SHA-copy requirements retained."
     },
     "config/file-metadata.json": {
       "description": "Repository file metadata including the seven active workflow copies in workspaces/api-to-nodejs/workflows/."
