@@ -2,8 +2,17 @@
 
 ## Five reserved input comments
 
-The first five comments on Issue #6 are command inputs: `6358997143`, `6358997306`, `6359048816`, `6359050701`, and `6359050871`. Owner edits to any of these comments beginning with `gh>` plus arguments execute through the existing listener and route-specific workflow. Each workflow selects the originating ID only if it belongs to this fixed set; otherwise the original first ID remains selected for normalization. A bare `gh>` does not execute. Successful commands reset their own input to `gh>`. Full output remains in Issue #7, with originator and response IDs referenced in Issue #6. These five comments are reserved for input, not response-slot reuse. Statements below describing only one input refer to the earlier arrangement and are superseded by this section.
+Edit any of the following five comments on [Issue #6](https://github.com/BestNameYet/CommandLine/issues/6) to submit a command:
 
+| Input | Comment ID |
+| --- | --- |
+| 1 | [6358997143](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6358997143) |
+| 2 | [6358997306](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6358997306) |
+| 3 | [6359048816](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6359048816) |
+| 4 | [6359050701](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6359050701) |
+| 5 | [6359050871](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6359050871) |
+
+Only owner edits to these five IDs can execute commands. Use `gh>` followed by CLI arguments; a bare `gh>` does nothing. Choose an idle input displaying `gh>` and wait for its result before reusing that input. After output and reference publication succeed, that same input resets to `gh>`. Full output is stored in Issue #7; Issue #6 references include `originatorCommentId` and `responseCommentId`. The five input comments retain their IDs and are reserved for command entry.
 
 ## Required documentation
 
@@ -25,7 +34,7 @@ To execute a requested `gh` command, edit any of the first five input comments o
 gh> issue view 6 --repo BestNameYet/CommandLine --json number,title
 ```
 
-Only owner edits to that fixed input comment can execute commands. The workflow gates execution on its ID and the event sender, because the first prompt is bot-authored. A standalone `gh>` never executes. Other human comments are cleared to a hidden `<!-- issue6-response-slot:available -->` flag without executing; they render blank and are reused for later response references. Bot responses remain unchanged. Reuse the same input comment for every command.
+Only owner edits to the five reserved input comments can execute commands. The workflow checks membership in the five-ID set and authorizes the event sender, including when an input is bot-authored. A standalone `gh>` never executes. Other human comments are cleared to a hidden `<!-- issue6-response-slot:available -->` flag without executing; they render blank and are reused for later response references. Bot responses remain unchanged. Reuse any of the five idle input comments.
 
 The runner publishes complete stdout, stderr, and exit status to a comment in [Issue #7](https://github.com/BestNameYet/CommandLine/issues/7). In Issue #6 it publishes a separate comment containing the original command and `responseCommentId`, which identifies the output comment. The submitted command comment is edited back to `gh>` after both publications succeed.
 
@@ -46,8 +55,8 @@ For `gh> commit <commentID>`, the referenced comment must be on Issue #7 and con
 
 ## Meta-instructor output ownership
 
-For the interactive meta-instructor, the fixed Issue #6 command-input comment
-is not an output location. Each session nonce chooses its own Issue #7 output
+For the interactive meta-instructor, the five reserved Issue #6 command-input comments
+are not output locations. Each session nonce chooses its own Issue #7 output
 comment at `gh> meta start`; preserve that comment ID and append later
 results to its `outputs` by editing the **same** Issue #7 comment. Never
 share a canonical output comment across concurrent or interleaved sessions.
