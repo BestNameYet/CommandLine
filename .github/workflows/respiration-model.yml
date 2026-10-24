@@ -48,3 +48,5 @@ jobs:
       - name: Require numerical tests to pass
         if: steps.tests.outputs.exitCode != '0'
         run: exit 1
+
+# Verification revision: coupled systemic stores implemented.
