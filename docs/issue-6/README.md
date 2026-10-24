@@ -1,5 +1,10 @@
 # Issue #6 — GitHub CLI command console
 
+## Five reserved input comments
+
+The first five comments on Issue #6 are command inputs: `6358997143`, `6358997306`, `6359048816`, `6359050701`, and `6359050871`. Owner edits to any of these comments beginning with `gh>` plus arguments execute through the existing listener and route-specific workflow. Each workflow selects the originating ID only if it belongs to this fixed set; otherwise the original first ID remains selected for normalization. A bare `gh>` does not execute. Successful commands reset their own input to `gh>`. Full output remains in Issue #7, with originator and response IDs referenced in Issue #6. These five comments are reserved for input, not response-slot reuse. Statements below describing only one input refer to the earlier arrangement and are superseded by this section.
+
+
 **Issue:** https://github.com/BestNameYet/CommandLine/issues/6  
 **Execution workflow:** [`.github/workflows/issue-6-gh.yml`](../../.github/workflows/issue-6-gh.yml)  
 **Executor:** [`runtime/issue6-gh-command.cjs`](../../runtime/issue6-gh-command.cjs)
