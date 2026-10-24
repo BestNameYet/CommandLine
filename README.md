@@ -2,8 +2,17 @@
 
 ## Five reserved input comments
 
-The first five comments on Issue #6 are command inputs: `6358997143`, `6358997306`, `6359048816`, `6359050701`, and `6359050871`. Owner edits to any of these comments beginning with `gh>` plus arguments execute through the existing listener and route-specific workflow. Each workflow selects the originating ID only if it belongs to this fixed set; otherwise the original first ID remains selected for normalization. A bare `gh>` does not execute. Successful commands reset their own input to `gh>`. Full output remains in Issue #7, with originator and response IDs referenced in Issue #6. These five comments are reserved for input, not response-slot reuse. Statements below describing only one input refer to the earlier arrangement and are superseded by this section.
+Edit any of the following five comments on [Issue #6](https://github.com/BestNameYet/CommandLine/issues/6) to submit a command:
 
+| Input | Comment ID |
+| --- | --- |
+| 1 | [6358997143](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6358997143) |
+| 2 | [6358997306](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6358997306) |
+| 3 | [6359048816](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6359048816) |
+| 4 | [6359050701](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6359050701) |
+| 5 | [6359050871](https://github.com/BestNameYet/CommandLine/issues/6#issuecomment-6359050871) |
+
+Only owner edits to these five IDs can execute commands. Use `gh>` followed by CLI arguments; a bare `gh>` does nothing. Choose an idle input displaying `gh>` and wait for its result before reusing that input. After output and reference publication succeed, that same input resets to `gh>`. Full output is stored in Issue #7; Issue #6 references include `originatorCommentId` and `responseCommentId`. The five input comments retain their IDs and are reserved for command entry.
 
 ## Workflow changes: mandatory GitHub integration
 
@@ -21,7 +30,7 @@ Edit any of the first five input comments on Issue #6 containing the `gh>` promp
 gh> issue view 6 --repo BestNameYet/CommandLine --json number,title
 ```
 
-The workflow executes `gh` on a GitHub Actions runner for owner edits to that input comment. It writes complete stdout/stderr and the exit code to a comment in [Issue #7](https://github.com/BestNameYet/CommandLine/issues/7). It then writes a separate **reference comment** in Issue #6 containing the submitted command and `responseCommentId`, which points to that Issue #7 output comment. Finally, it edits the submitted input comment back to `gh>`. Only owner edits to comment `6358997143` execute; the workflow explicitly checks this ID and the event sender. A standalone `gh>` does nothing. Human comments elsewhere are cleared to a hidden `<!-- issue6-response-slot:available -->` flag without executing. These render blank and are reused for later response references before new response comments are created. Invalid text in the input is also reset in place. Comment IDs and bot responses are preserved.
+The workflow executes `gh` on a GitHub Actions runner for owner edits to that input comment. It writes complete stdout/stderr and the exit code to a comment in [Issue #7](https://github.com/BestNameYet/CommandLine/issues/7). It then writes a separate **reference comment** in Issue #6 containing the submitted command and `responseCommentId`, which points to that Issue #7 output comment. Finally, it edits the submitted input comment back to `gh>`. Only owner edits to the five reserved input IDs execute; the workflow checks the selected comment ID and the event sender. A standalone `gh>` does nothing. Human comments elsewhere are cleared to a hidden `<!-- issue6-response-slot:available -->` flag without executing. These render blank and are reused for later response references before new response comments are created. Invalid text in the input is also reset in place. Comment IDs and bot responses are preserved.
 
 **Read the [Issue #6 README](docs/issue-6/README.md) for the exact protocol, permissions, and limitations.** This interface runs the GitHub CLI, not arbitrary shell commands. Authorization to use the console does not authorize unsolicited operations or the separately designed JavaScript functions.
 
@@ -44,7 +53,7 @@ The commit command reads an Issue #7 comment containing a JSON object with `file
 ## Meta-instructor output IDs
 
 The meta-instructor in [workspaces/meta-instructor/](workspaces/meta-instructor/README.md)
-uses the fixed Issue #6 prompt for commands, but **selects a separate Issue #7
+uses any of the five reserved Issue #6 inputs for commands, but **selects a separate Issue #7
 output comment per session nonce**. The ID created at `meta start` is reused
 for subsequent `meta respond` and `meta status` calls: results are appended
 to that session comment's `outputs` array by editing the same comment ID.
