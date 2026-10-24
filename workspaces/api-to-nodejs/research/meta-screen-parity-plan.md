@@ -34,7 +34,7 @@ Source evidence: reference README, issue-workflow.js, transitions.json, gemini-w
 
 A renderer-only addition would leave mode, recovery, worker and workspace behavior missing. Replacing the current controller would discard its established managed-action grants and session receipts. Proposed approach: retain that controller and isolate the reference procedure engine behind an explicit application adapter under workspaces/meta-instructor/, with queue-linked procedure sessions and shared receipt checks. This is the builder's proposal, not a recorded user selection.
 
-Use a dedicated owner-only procedure issue marker bound to a saved central job and a unique session nonce. Issue6 remains queue updates only. Persist each procedure session in its own Issue7 comment or per-issue record with exactly one canonical state owner; do not create competing authoritative records. Choose per-issue repository state when file/report recovery requires atomic commit relationships, retaining Issue7 outputs as published receipts with state locators. Migration must explicitly preserve existing session comment IDs and histories.
+Use a dedicated owner-only procedure issue marker bound to a saved central job and a unique session nonce. Issue6 remains queue updates only. For new procedure sessions, the canonical state is workspaces/meta-instructor/procedure/issue-runs/<issueNumber>.json. It contains schemaVersion, jobId, nonce, issueNumber, revision, outputCommentId, expectedInputs, acceptedCommentIds, publicationIntents and publicationReceipts. Save using the current Git blob SHA; retry after a conflict only after rereading and rejecting stale input. A nonce index maps to that issue number and original outputCommentId, but never duplicates session state. Issue7 outputs are published projections with state path/revision locators. State and index writes are separate, not atomic: write state first, recover a missing index by exact nonce/job binding, and reject conflicting bindings. Existing meta-instructor-session comments remain authoritative for their legacy controller sessions; retain their IDs/histories and dispatch them through the legacy adapter. Do not silently migrate or fork a legacy session.
 
 Normal mode uses the reference transition contract; Gemini mode delegates only screen/control generation; Mirror mode accepts supplied screens without a model call. Deterministic code owns authorization, validation, state, readiness and publication. Generated semantic completion remains a model assessment, never proof of task success. Reuse current managed receipts for allowed operations.
 
@@ -49,7 +49,7 @@ For agentic workers: use the executing-plans or subagent-driven-development skil
 ### Task 1: Add the isolated procedure engine and state contract
 
 Files under workspaces/meta-instructor/procedure/: state.cjs, schemas.cjs, normal.cjs, fixtures/ and engine.test.cjs.
-Interface: createSession({jobId,nonce,issueNumber,mode,prompt}) -> session; applyInput(session,input) -> new session; currentScreen(session) -> {requestId,instruction,expectedInputs}; no API side effects.
+Interface: createSession({jobId,nonce,issueNumber}) -> session at reference render24; applyInput(session,input) -> new session; currentScreen(session) -> {requestId,instruction,expectedInputs}; no API side effects. Collect mode interactively at render24, then exact prompt at render1; only afterward start the selected engine. Existing sessions continue at their saved request without retroactive initialization.
 - [ ] Add failing lifecycle tests for normal reference branches, wrong names/types, repeated render with new request, stale request, duplicate input and legacy session preservation.
 - [ ] Port the pinned reference transitions/render contracts and retain explicit provenance.
 - [ ] Run node --test workspaces/meta-instructor/procedure/engine.test.cjs; require zero failures.
@@ -59,14 +59,14 @@ Interface: createSession({jobId,nonce,issueNumber,mode,prompt}) -> session; appl
 Files: mirror.cjs, generated.cjs, provider.cjs, template.json and screens.test.cjs.
 Interfaces: acceptProducer(session,{control,instruction?,expectedInputs?}); acceptReturns(session,values); generateNext(session,provider). All return candidate state; persistence remains separate.
 - [ ] Test outstanding-return rejection, publication prerequisite, exact schemas, reserved envelope name, repeated-variable history, unsupported schema keywords and control-only completion.
-- [ ] Test up to three malformed-response corrections, accepted variables surviving provider failure, baseline not counting as a stall, navigation/retry not counting, third accepted no-progress turn producing incomplete status.
+- [ ] Test up to three malformed-response corrections, accepted variables surviving provider failure, baseline not counting as a stall, navigation/retry not counting, third accepted no-progress turn producing incomplete status. Assert complete append-only screen/value/control replay. Supervisor sees file bodies only from its own explicit read_files; worker reads, write bodies and cached worker files retain metadata with contentOmitted:true. Test commands-only exchanges save intent/results, recall provider with updated state, preserve current screen, recover without reexecuting completed commands and do not count as operator stall turns.
 - [ ] Implement from the reference behavior; run screen tests and existing controller tests.
 
 ### Task 3: Add durable owner-only transport and recovery
 
 Files: procedure-adapter.cjs, persistence.cjs, publication.cjs and adapter.test.cjs.
 Interfaces: loadSession(locator), saveSession(expectedVersion,next), publishScreen(savedSession) -> receipt; handleEvent(event,api) rejects unqueued/unbound jobs and unauthorized actors before side effects.
-- [ ] Test two concurrent nonce/issue sessions, optimistic-save conflicts, failed publication, success followed by failed receipt save, retry deduplication, state/back navigation and preserved request.
+- [ ] Test two concurrent nonce/issue sessions, optimistic-save conflicts, index-write failure after state save, legacy session dispatch, failed publication, success followed by failed receipt save, retry deduplication, state/back navigation and preserved request. Preflight complete comments including wrappers against65000 characters; fail without truncation. Bound/split state display. Broadcast A/B/C parts need separate receipts and no returns become available until all required parts publish.
 - [ ] Persist intent before execution, state before publication, and receipts afterward. Document the unavoidable publication/save crash window.
 - [ ] Run adapter and existing console/controller regressions.
 
@@ -74,7 +74,7 @@ Interfaces: loadSession(locator), saveSession(expectedVersion,next), publishScre
 
 Files: workspace.cjs, workers.cjs, invocation-reports.cjs and their tests.
 Interfaces: executeWorkspaceAction(grant,action), prepareWorker(session,assignment), applyWorkerReturn(session,nonce,values), recordInvocation(session,receipt).
-- [ ] Test traversal and root-denial, missing/read-only grants, before/after hashes, interrupted operation recovery, independent worker nonces, repeated delivery, prepared-work replay, wrong worker return and missing invocation report.
+- [ ] Test traversal and root-denial, missing/read-only grants, before/after hashes, interrupted operation recovery, independent worker nonces, repeated delivery, prepared-work replay and wrong worker return. Require immediate prepared delivery before other registrations, one pending assignment per nonce, run-wide unique assignment IDs, next<nonce> preserving other unfinished assignments, partial broadcast recovery, failed-worker retry preserving accepted workers, and baseline plus ordered set/delete/append reconstruction. For normal renders13/17 reject comment returns and require a committed issue-bound per-run invocation report; invalid append leaves screen unchanged, cumulative loop reports persist, accepted markers suppress replays, and renders14/18 link the artifact without embedding it.
 - [ ] Port reference inventory/read/write/standing-rule semantics into the existing granted-action boundary. Do not grant arbitrary filesystem or remote access.
 - [ ] Verify all four reference normal paths and worker lifecycle fixtures.
 
@@ -93,3 +93,7 @@ Concurrent saves must not overwrite other sessions. An unpublished screen must n
 ## Status and next action
 
 Reference discovery is complete. Gap analysis and plan are prepared. Product code, dependencies, workflow registration and live tests have not been changed. Review this design before starting implementation; existing meta command routing also needs reconciliation with the newer queue-only rule rather than silently bypassing it.
+
+## Builder review disposition
+
+Read-only reference review identified seven material gaps. This revision resolves canonical storage/migration, interactive initialization, worker scheduling/reconstruction, supervisor content filtering, invocation-report transport, comment sizing/publication splits, and commands-only recovery. These are design/test requirements; none is an execution claim.
