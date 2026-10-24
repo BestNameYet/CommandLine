@@ -59,3 +59,55 @@ test('full lifecycle gates final report at 500 words',()=>{
  assert.equal(s.phase,'complete');assert.equal(m.request(s).returnSchema.type,'null');
  assert.throws(()=>reply(s,null));
 });
+
+const {appendOutput,compactRequest} = require('./issue6-adapter.cjs');
+test('meta outputs append to a stable per-session record without duplicating context',()=>{
+ const state={nonce:'alpha',phase:'questions',plan:[],qa:[]};
+ const request={nonce:'alpha',requestId:'alpha:0:questions',phase:'questions',
+   instruction:'Supply questions',context:{plan:[],qa:[]},returnSchema:{type:'array'}};
+ const first=appendOutput(null,'alpha',state,{type:'meta-instructor-result',nonce:'alpha',
+   status:'awaiting-agent',exitCode:0,errors:[],request});
+ assert.equal(first.outputs.length,1);
+ assert.equal(first.outputs[0].request.context,undefined);
+ assert.deepEqual(first.state,state);
+ const second=appendOutput(first,'alpha',{...state,phase:'answers'},
+   {type:'meta-instructor-result',nonce:'alpha',status:'awaiting-agent',exitCode:0,errors:[],request:{...request,phase:'answers'}});
+ assert.equal(second.outputs.length,2);
+ assert.equal(second.outputs[0].request.phase,'questions');
+ assert.equal(second.outputs[1].request.phase,'answers');
+ assert.equal(second.state.phase,'answers');
+});
+test('separate meta instances never merge their output records',()=>{
+ const alpha=appendOutput(null,'alpha',{phase:'questions'},
+   {status:'awaiting-agent',request:{context:{secret:'alpha'},phase:'questions'}});
+ const beta=appendOutput(null,'beta',{phase:'questions'},
+   {status:'awaiting-agent',request:{context:{secret:'beta'},phase:'questions'}});
+ assert.equal(alpha.nonce,'alpha'); assert.equal(beta.nonce,'beta');
+ assert.notStrictEqual(alpha.outputs,beta.outputs);
+ assert.throws(()=>appendOutput(alpha,'beta',{phase:'answers'},{status:'awaiting-agent'}),/different session/);
+ assert.equal(compactRequest({instruction:'x',context:{large:'data'}}).context,undefined);
+});
+test('legacy meta session is migrated into the same output history',()=>{
+ const previous={type:'meta-instructor-session',nonce:'existing',state:{phase:'questions'},
+  request:{phase:'questions',context:{qa:[{id:'q'}]},requestId:'existing:0:questions'}};
+ const result=appendOutput(previous,'existing',{phase:'answers'},
+   {type:'meta-instructor-result',status:'awaiting-agent',
+    request:{phase:'answers',context:{qa:[{id:'q'}]}}});
+ assert.equal(result.outputs.length,2);
+ assert.equal(result.outputs[0].request.phase,'questions');
+ assert.equal(result.outputs[1].request.phase,'answers');
+ assert.equal(result.outputs[0].request.context,undefined);
+});
+test('invalid response and status outputs append without changing the saved state',()=>{
+ const state={nonce:'alpha',phase:'answers',revision:1};
+ const first=appendOutput(null,'alpha',state,
+   {status:'awaiting-agent',errors:[],request:{phase:'answers'}});
+ const rejected=appendOutput(first,'alpha',state,
+   {status:'validation-failed',exitCode:1,errors:['invalid schema'],request:{phase:'answers'}});
+ const status=appendOutput(rejected,'alpha',state,
+   {status:'awaiting-agent',exitCode:0,errors:[],request:{phase:'answers'}});
+ assert.deepEqual(status.state,state);
+ assert.equal(status.outputs.length,3);
+ assert.equal(status.outputs[1].status,'validation-failed');
+ assert.equal(status.outputs[2].status,'awaiting-agent');
+});
