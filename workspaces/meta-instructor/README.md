@@ -107,3 +107,96 @@ The reusable meta workflow runs these checks before processing a command.
 The existing listener owner, fixed-input and stale-event gates are retained.
 Application workflow needs contents:read and issues:write only; it does not
 commit files. Repository writes continue through the separate commit adapter.
+
+
+## Manager-mediated execution (Issue #7 enforcement proposal)
+
+The controller grants only one plan step at a time. A plan step can declare
+`allowedOperations` and optional `readOnly`. Its grant is bound to the
+session nonce, requirement generation, active step ID, and state revision.
+The authorization object is a state locator, **not a bearer secret**; the
+trusted Issue #6 owner/event gate and current persisted state are validated
+before each mediated operation.
+
+Available managed operations are:
+- `issue.read`: `{"issueNumber":7}` — read a repository issue.
+- `comment.read`: `{"commentId":123}` — read a repository issue comment.
+- `repository.read`: `{"path":"README.md"}` — read an ordinary repository file.
+- `issue.comment`: `{"issueNumber":7,"body":"..."}` — create an Issue #7 comment.
+
+The manager cannot intercept ordinary ChatGPT tools, external browser activity,
+direct tool calls outside this route, or file changes made through the separately
+authorized commit adapter. Those paths are **not enforced** by this manager.
+Managed write access is restricted to Issue #7 comments; Issue #6's input and
+repository file writes are not controlled by `meta action`.
+
+### Execute a managed action
+
+1. Read the current request from this nonce's persistent Issue #7 session
+   comment. Find `authorization.grant` and `ui.permittedOperations`.
+2. Create an Issue #7 source comment with the action JSON below (use
+   the values of the **current** grant, not values from an older output).
+3. Edit fixed Issue #6 input to `gh> meta action NONCE ACTION_COMMENT_ID`.
+   Read the latest appended session output, its receipt record in `state.receipts`,
+   and the new revision before attempting any other action.
+4. When finished with this step, use `gh> meta pause NONCE`. Only then
+   submit the `execute` report using `gh> meta respond NONCE RESPONSE_COMMENT_ID`.
+   A completed managed step needs a successful, same-step executor receipt
+   cited as `receipt:<receipt-id>` in its evidence array. A failed action
+   cannot satisfy completion. A blocked report holds the current step.
+   Use `gh> meta resume NONCE` only after a blocked report to authorize
+   corrective actions within that **same** step.
+
+```json
+{
+  "nonce": "YOUR_NONCE",
+  "generation": 0,
+  "stepId": "CURRENT_STEP_ID",
+  "revision": 4,
+  "operation": "issue.read",
+  "args": {"issueNumber": 7}
+}
+```
+
+### Revise task requirements
+
+Create an Issue #7 source comment containing
+`{"problem":"Revised full task","reason":"What changed","restartAt":"questions"}`
+and submit `gh> meta revise NONCE COMMENT_ID`. Use `restartAt:"plan"`
+only when the existing QA still suffices. The controller retains the
+superseded generation in its session history, invalidates old grants,
+and returns to the requested phase. Revisions affect only the supplied nonce.
+
+### Receipt and execution boundaries
+
+`meta action` checks the current grant **before** issuing its Node-backed
+GitHub operation. The executor records the actual response or failure, not an
+agent-authored success claim. The persisted receipt carries the nonce,
+generation, step, revision, source comment and operation. The current-step
+report gate checks those records before allowing advancement. Receipt
+validation attests to execution through this adapter; it does not establish
+the accuracy of an agent's independent research or the completeness of a
+large real-world objective.
+
+`meta pause` suspends further managed tool actions; a valid step report
+advances exactly one plan step. An invalid report leaves the current request
+and next-step lock unchanged. An accepted blocked report keeps its step
+locked until corrective action and a subsequent accepted completion report.
+
+### Conversation visibility
+
+Every output appends a compact `ui` instruction to the same per-session
+Issue #7 output comment. This includes phase, current step, pause gate,
+permitted operations, and next required response. The linked Issue #7 comment
+is the persisted authoritative UI source. This GitHub workflow cannot
+automatically inject a new message into an existing ChatGPT conversation;
+a ChatGPT agent can surface the linked current instruction in its own reply.
+
+### Verification and limits
+
+Run `node --test workspaces/meta-instructor/controller.test.cjs tests/issue6-gh-command.test.cjs tests/issue6-route.test.cjs tests/issue6-commit.test.cjs`
+through the documented Actions workflow. Test allowed and denied
+operations, stale/cross-session grants, successful/failed receipts,
+pause/report/resume, requirement revisions, and session output isolation.
+No additional arbitrary storage, question, step, or reporting limits are
+introduced by this enforcement layer. Actual GitHub comment/API limits remain.
