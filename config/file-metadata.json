@@ -109,6 +109,12 @@
     "workspaces/api-to-nodejs/diagnostics/issue-1-comments-2026-10-24-export.cjs": {
       "description": "Self-extracting, lossless LZW-compressed JSON snapshot of the full GitHub Issue #1 comment collection for diagnostic analysis.",
       "category": "diagnostic"
+    },
+    "workspaces/api-to-nodejs/research/idea-inventory-procedure.md": {
+      "description": "Evidence-based cross-repository idea and technique inventory procedure, prior GeminiSupervisor inventory reference, coverage checkpoints and status distinctions."
+    },
+    "workspaces/api-to-nodejs/research/meta-screen-parity-plan.md": {
+      "description": "Pinned StateMachines normal/Gemini/Mirror reference, verified current-meta gaps, proposed architecture and implementation/acceptance plan; product implementation pending."
     }
   }
 }
