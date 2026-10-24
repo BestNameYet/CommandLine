@@ -16,9 +16,18 @@ Only owner edits to these five IDs can execute commands. Use `gh>` followed by C
 
 ## Workflow changes: mandatory GitHub integration
 
-**Required exception to the Issue #6 command-line rule:** For any creation, modification, replacement, or deletion of files under `.github/workflows/`, use the connected **GitHub integration** directly. **Do not use `gh>`, `gh> commit <commentID>`, or the Issue #6 commit workflow to change workflow files.** The Issue #6 runtime token is not a substitute for an integration credential authorized to update GitHub Actions workflows.
+**Required exception to the Issue #6 command-line rule:** For any creation, modification, replacement, or deletion of files under `.github/workflows/`, use the connected **GitHub integration** directly. **Do not use `gh>`, `gh> commit <commentID>`, or the Issue #6 commit workflow to write the live files under `.github/workflows/`.** The Issue #6 runtime token is not a substitute for an integration credential authorized to update GitHub Actions workflows.
 
-Read the current workflow and related repository instructions first; perform the file change through the GitHub integration, then fetch the resulting workflow from GitHub and verify its content and commit. If the integration denies workflow-file writes, report the limitation rather than bypassing the restriction through another command path. For non-workflow operations, continue to use the authorized Issue #6 command interface where applicable.
+For each new or updated workflow, use this required candidate-first sequence:
+
+1. Read the current workflow, its local copy, and applicable repository instructions. Prepare the candidate YAML while preserving its spacing and line breaks.
+2. Submit the candidate through the Issue #6 command interface and commit it first to `workspaces/api-to-nodejs/workflows/<filename>`. Use the documented file object on Issue #7 (`filename` is that local repository path; `body` is the candidate YAML), then edit an idle reserved Issue #6 input to `gh> commit <commentID>`. Inspect the successful commit receipt and verify the saved candidate. Raw candidate YAML is not an executable Issue #6 command.
+3. Use the connected GitHub integration to create or update `.github/workflows/<filename>` with exactly the saved candidate's bytes. This is a SHA-identical content copy: preserve the YAML filename, spacing, encoding, and line endings. Do not replace it with a link or wrapper.
+4. Fetch the resulting live workflow and local candidate, verify their content and commits, and require their Git blob SHAs to be equal before reporting completion or resuming ordinary Issue #6 commands.
+
+Committing the local candidate first temporarily makes the workflow SHA comparison false. The listener must stop and print the mismatch while that is true; use the required GitHub integration to complete the live copy, rather than bypassing or disabling the gate. The listener continues only when the overall workflow SHA AND comparison is true.
+
+If the integration denies workflow-file writes, report the incomplete promotion and the SHA mismatch rather than bypassing the restriction through another command path. For non-workflow operations, continue to use the authorized Issue #6 command interface where applicable.
 
 ## Authorized GitHub command line
 
