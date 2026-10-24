@@ -1,5 +1,11 @@
 # CommandLine
 
+## Workflow changes: mandatory GitHub integration
+
+**Required exception to the Issue #6 command-line rule:** For any creation, modification, replacement, or deletion of files under `.github/workflows/`, use the connected **GitHub integration** directly. **Do not use `gh>`, `gh> commit <commentID>`, or the Issue #6 commit workflow to change workflow files.** The Issue #6 runtime token is not a substitute for an integration credential authorized to update GitHub Actions workflows.
+
+Read the current workflow and related repository instructions first; perform the file change through the GitHub integration, then fetch the resulting workflow from GitHub and verify its content and commit. If the integration denies workflow-file writes, report the limitation rather than bypassing the restriction through another command path. For non-workflow operations, continue to use the authorized Issue #6 command interface where applicable.
+
 ## Authorized GitHub command line
 
 **[Issue #6 — GitHub CLI command console](https://github.com/BestNameYet/CommandLine/issues/6)** is the repository's authorized command-line interface for GitHub CLI operations. Use this console for requested `gh` commands rather than bypassing it with direct GitHub API calls.
