@@ -13,17 +13,14 @@ function selectRoute(event, repository, inputId = INPUT_ID) {
   const owner = event.repository?.owner?.login;
   const actor = event.sender?.login;
 
-  // Owner edits to the fixed prompt are the only command input.
-  // Other non-bot comments are normalized by the existing executor.
   if (!isInput) return comment.user?.type === 'Bot' ? 'ignore' : 'normalize';
   if (event.action !== 'edited' || actor !== owner) return 'ignore';
 
   const body = String(comment.body || '').trim();
   if (!/^gh>(?:\s|$)/.test(body) || body === 'gh>') return 'normalize';
   const argumentsText = body.slice(3).trim();
-  // Malformed commit arguments go to the commit workflow for a failure receipt,
-  // rather than being executed as a generic gh subcommand.
   if (/^commit(?:\s|$)/.test(argumentsText)) return 'commit';
+  if (/^meta(?:\s|$)/.test(argumentsText)) return 'meta';
   return 'gh';
 }
 
