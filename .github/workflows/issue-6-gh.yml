@@ -24,6 +24,25 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Verify existing console regressions and five input routes
+        run: |
+          node --test tests/issue6-gh-command.test.cjs tests/issue6-route.test.cjs tests/issue6-commit.test.cjs
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+          const {selectRoute} = require('./runtime/issue6-route.cjs');
+          const ids = [6358997143,6358997306,6359048816,6359050701,6359050871];
+          const base = {action:'edited',issue:{number:6},repository:{full_name:'BestNameYet/CommandLine',owner:{login:'BestNameYet'}},sender:{login:'BestNameYet',type:'User'}};
+          for (const id of ids) {
+            for (const [body,want] of [['gh> issue view 6','gh'],['gh> commit 123','commit'],['gh> meta status smoke','meta'],['gh>','normalize']]) {
+              const event = {...base,comment:{id,body,user:{type:'Bot'}}};
+              assert.equal(selectRoute(event,'BestNameYet/CommandLine',String(id)),want);
+              assert.equal(selectRoute({...event,sender:{login:'visitor',type:'User'}},'BestNameYet/CommandLine',String(id)),'ignore');
+            }
+          }
+          const outsider = {...base,comment:{id:999,body:'gh> issue view 6',user:{type:'User'}}};
+          assert.equal(selectRoute(outsider,'BestNameYet/CommandLine','6358997143'),'normalize');
+          console.log('Five input IDs: gh, commit, meta, bare prompt, owner-only, and outside-ID checks passed');
+          NODE
       - id: route
         name: Select exactly one command workflow
         run: node runtime/issue6-route.cjs
