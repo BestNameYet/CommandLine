@@ -13,10 +13,10 @@
       "description": "Current five-input Issue 6 console protocol, lifecycle, comment normalization, commit route, and per-session meta output."
     },
     "AGENTS.md": {
-      "description": "Agent instructions establishing central Issue 7 job queue comment 6389130786, shared JSON jobs and progress, queue-only Issue 6 submissions, and precedence over legacy direct-work commands."
+      "description": "Agent instructions establishing central Issue 7 job queue comment 6389130786, shared JSON jobs and progress, queue-only Issue 6 submissions, and precedence over legacy direct-work commands. Defines a complete nullable job return record with verbatim prompts, submission nonce, per-step worker assignment/nonces, next-available-step selection, action/file paths and comment IDs, per-file change history, and final results."
     },
     "README.md": {
-      "description": "Repository overview requiring all agents to receive jobs and update completion progress in central Issue 7 queue comment 6389130786, with Issue 6 reserved for queue updates and existing workflow SHA-copy requirements retained."
+      "description": "Repository overview requiring all agents to receive jobs and update completion progress in central Issue 7 queue comment 6389130786, with Issue 6 reserved for queue updates and existing workflow SHA-copy requirements retained. Defines a complete nullable job return record with verbatim prompts, submission nonce, per-step worker assignment/nonces, next-available-step selection, action/file paths and comment IDs, per-file change history, and final results."
     },
     "config/file-metadata.json": {
       "description": "Repository file metadata including the seven active workflow copies in workspaces/api-to-nodejs/workflows/."
