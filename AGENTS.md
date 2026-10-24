@@ -1,5 +1,10 @@
 # Agent instructions — CommandLine
 
+## Five reserved input comments
+
+The first five comments on Issue #6 are command inputs: `6358997143`, `6358997306`, `6359048816`, `6359050701`, and `6359050871`. Owner edits to any of these comments beginning with `gh>` plus arguments execute through the existing listener and route-specific workflow. Each workflow selects the originating ID only if it belongs to this fixed set; otherwise the original first ID remains selected for normalization. A bare `gh>` does not execute. Successful commands reset their own input to `gh>`. Full output remains in Issue #7, with originator and response IDs referenced in Issue #6. These five comments are reserved for input, not response-slot reuse. Statements below describing only one input refer to the earlier arrangement and are superseded by this section.
+
+
 ## Required documentation
 
 Read this `AGENTS.md`, the repository's current [README.md](README.md), and any applicable workspace instructions before repository work. Treat these documents as governing instructions for the current repository. Do not assume deleted services or undocumented runners remain available.
@@ -14,7 +19,7 @@ Read the current workflow and related repository instructions first; perform the
 
 **[Issue #6 — GitHub CLI command console](https://github.com/BestNameYet/CommandLine/issues/6) is the authorized repository command line for GitHub CLI operations.**
 
-To execute a requested `gh` command, edit only the first input comment on Issue #6 (ID `6358997143`) beginning with `gh>`, followed by CLI arguments. Do not repeat `gh` after the prompt:
+To execute a requested `gh` command, edit any of the first five input comments on Issue #6 beginning with `gh>`, followed by CLI arguments. Do not repeat `gh` after the prompt:
 
 ```text
 gh> issue view 6 --repo BestNameYet/CommandLine --json number,title
