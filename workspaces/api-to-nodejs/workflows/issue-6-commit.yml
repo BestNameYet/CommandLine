@@ -1,0 +1,23 @@
+name: Issue 6 Commit Comment Adapter
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  commit-comment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      issues: write
+    env:
+      ISSUE6_INPUT_COMMENT_ID: ${{ contains(fromJSON('[6358997143,6358997306,6359048816,6359050701,6359050871]'), github.event.comment.id) && github.event.comment.id || '6358997143' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate referenced Issue 7 file object and commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node runtime/issue6-commit.cjs
