@@ -10,16 +10,16 @@
       "description": "Single Issue 6 listener and preprocessor; routes fixed-comment owner edits to standard or commit reusable workflows."
     },
     "docs/issue-6/README.md": {
-      "description": "Issue 6 command protocol and routed commit adapter."
+      "description": "Issue 6 console procedure, routing, comment protocol, and integration-only workflow editing rule."
     },
     "AGENTS.md": {
-      "description": "Agent guidance for fixed input, preprocessor, standard gh commands and commit adapter."
+      "description": "Canonical agent instructions; requires connected GitHub integration for .github/workflows/ changes; specifies Issue 6 console and commit adapter."
     },
     "README.md": {
-      "description": "CommandLine introduction and supported read-only and write-enabled Issue 6 routes."
+      "description": "Canonical repository overview and mandatory GitHub integration exception for workflow edits."
     },
     "config/file-metadata.json": {
-      "description": "Repository file metadata, including the Issue 6 commit adapter."
+      "description": "Registry of documented repository files and canonical workflow-editing instructions."
     },
     ".github/workflows/issue-6-standard.yml": {
       "description": "Read-only reusable workflow for ordinary gh commands and normalization."
@@ -40,7 +40,7 @@
       "description": "Tests for JSON source validation, safe paths, create/update/no-op, and receipts."
     },
     "docs/issue-6/COMMIT_ADAPTER.md": {
-      "description": "Commit route syntax, input JSON format, token scopes, and verification procedure."
+      "description": "Issue 7 file-object commit protocol; workflow-file writes must use GitHub integration."
     }
   }
 }
