@@ -111,3 +111,75 @@ test('invalid response and status outputs append without changing the saved stat
  assert.equal(status.outputs[1].status,'validation-failed');
  assert.equal(status.outputs[2].status,'awaiting-agent');
 });
+
+function managedSession(nonce='managed-01'){
+ let s=m.create('Verify manager-enforced execution',nonce);
+ s=reply(s,questions);s=reply(s,answer);s=reply(s,{ready:true,reason:'Enough context',questions:[]});
+ const steps=Array.from({length:5},(_,i)=>({id:'m'+i,title:'Managed step '+i,
+  action:'Execute permitted work '+i,explanation:prose(100),expectedEvidence:'Verified receipt'}));
+ steps[0].allowedOperations=['issue.read'];steps[0].readOnly=true;
+ steps[1].allowedOperations=['issue.comment'];steps[1].readOnly=false;
+ return reply(s,steps);
+}
+function actionFor(s,operation,args){
+ const g=m.activeGrant(s);
+ return {nonce:g.nonce,generation:g.generation,stepId:g.stepId,revision:g.revision,operation,args};
+}
+test('managed grants reject future steps, writes under read-only steps, and stale revisions without side effects',()=>{
+ const s=managedSession();let sideEffects=0;
+ const attempt=a=>{m.assertAction(s,a);sideEffects++;};
+ assert.throws(()=>attempt({...actionFor(s,'issue.read',{issueNumber:7}),stepId:'m1'}),/mismatched/);
+ assert.throws(()=>attempt(actionFor(s,'issue.comment',{issueNumber:7,body:'write'})),/not permitted/);
+ assert.equal(sideEffects,0);
+ attempt(actionFor(s,'issue.read',{issueNumber:7}));assert.equal(sideEffects,1);
+ const recorded=m.recordAction(s,actionFor(s,'issue.read',{issueNumber:7}),{success:true,reference:'https://github.com/BestNameYet/CommandLine/issues/7'},9001);
+ assert.throws(()=>m.assertAction(recorded.state,actionFor(s,'issue.read',{issueNumber:7})),/Stale/);
+});
+test('step receipts are checked before unlocking next step, and pause is enforced',()=>{
+ let s=managedSession();
+ const act=actionFor(s,'issue.read',{issueNumber:7});
+ const saved=m.recordAction(s,act,{success:true,reference:'issue:7',result:{number:7}},9002);s=saved.state;
+ const report={stepId:'m0',status:'completed',summary:'Issue read',evidence:[{reference:'receipt:'+saved.receipt.id,observation:'Issue returned'}],blockers:[]};
+ assert.throws(()=>reply(s,report),/Pause/);
+ s=m.pause(s);
+ assert.equal(m.request(s).authorization.okayToContinue,false);
+ assert.throws(()=>m.assertAction(s,actionFor(saved.state,'issue.read',{issueNumber:7})),/No active/);
+ assert.throws(()=>reply(s,{...report,evidence:[{reference:'receipt:other-task:0:9002',observation:'Wrong receipt'}]}),/matching/);
+ s=reply(s,report);assert.equal(s.index,1);assert.equal(m.request(s).authorization.stepId,'m1');
+ assert.equal(m.request(s).ui.permittedOperations[0],'issue.comment');
+});
+test('failed managed actions do not satisfy completion; blocked reports permit corrective resume',()=>{
+ let s=managedSession();
+ const a=actionFor(s,'issue.read',{issueNumber:7});
+ const {state,receipt}=m.recordAction(s,a,{success:false,error:'GitHub refused'},9003);s=m.pause(state);
+ assert.throws(()=>reply(s,{stepId:'m0',status:'completed',summary:'done',evidence:[{reference:'receipt:'+receipt.id,observation:'failed'}],blockers:[]}),/successful/);
+ s=reply(s,{stepId:'m0',status:'blocked',summary:'API error',evidence:[],blockers:['GitHub refused']});
+ assert.equal(s.index,0);const rev=s.revision;
+ s=m.resume(s);assert.equal(s.gate,'active');assert.ok(s.revision>rev);
+ assert.throws(()=>m.assertAction(s,a),/Stale/);
+});
+test('user corrections supersede prior plans, invalidate grants, preserve history and isolate sessions',()=>{
+ const first=managedSession('first-01'),second=managedSession('second-01');
+ const oldAction=actionFor(first,'issue.read',{issueNumber:7});
+ const changed=m.revise(first,{problem:'Revised scope',reason:'Updated user requirements',restartAt:'plan'});
+ assert.equal(changed.generation,1);assert.equal(changed.phase,'plan');
+ assert.equal(changed.history.length,1);assert.equal(changed.history[0].status,'superseded');
+ assert.throws(()=>m.assertAction(changed,oldAction),/No active/);
+ assert.equal(second.generation,0);assert.equal(second.phase,'execute');
+ assert.throws(()=>m.assertAction(second,oldAction),/mismatched/);
+ const restart=m.revise(first,{problem:'New questions',reason:'Scope completely changed',restartAt:'questions'});
+ assert.equal(restart.phase,'questions');assert.equal(restart.qa.length,0);
+});
+test('new meta command verbs and compact active instructions are exposed',()=>{
+ const {parseCommand}=require('./issue6-adapter.cjs');
+ assert.equal(parseCommand('gh> meta action example-1 55').action,'action');
+ assert.equal(parseCommand('gh> meta revise example-1 55').action,'revise');
+ assert.equal(parseCommand('gh> meta pause example-1').action,'pause');
+ assert.equal(parseCommand('gh> meta resume example-1').action,'resume');
+ assert.throws(()=>parseCommand('gh> meta action example-1'));
+ const s=managedSession();
+ const r=m.request(s);
+ assert.deepEqual(r.ui.permittedOperations,['issue.read']);
+ assert.equal(r.authorization.grant.nonce,s.nonce);
+ assert.equal(r.ui.gate,'active');
+});
