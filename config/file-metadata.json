@@ -10,16 +10,16 @@
       "description": "Issue 6 listener selecting standard, commit, or meta-instructor reusable workflows. Supports owner-edited commands in the first five reserved Issue 6 comments."
     },
     "docs/issue-6/README.md": {
-      "description": "Issue 6 command protocol and routed commit adapter. Supports owner-edited commands in the first five reserved Issue 6 comments."
+      "description": "Current five-input Issue 6 console protocol, lifecycle, comment normalization, commit route, and per-session meta output."
     },
     "AGENTS.md": {
-      "description": "Agent guidance for fixed input, preprocessor, standard gh commands and commit adapter. Supports owner-edited commands in the first five reserved Issue 6 comments."
+      "description": "Agent instructions for five reserved Issue 6 input IDs, owner-only submission, result correlation, reuse, and authorized command routes."
     },
     "README.md": {
-      "description": "CommandLine introduction and supported read-only and write-enabled Issue 6 routes. Supports owner-edited commands in the first five reserved Issue 6 comments."
+      "description": "CommandLine overview with direct links to all five reserved inputs, submission and reset behavior, and output locations."
     },
     "config/file-metadata.json": {
-      "description": "Repository file metadata, including the Issue 6 commit adapter."
+      "description": "Repository file metadata reflecting the five-input console documentation."
     },
     ".github/workflows/issue-6-standard.yml": {
       "description": "Read-only reusable workflow for ordinary gh commands and normalization. Supports owner-edited commands in the first five reserved Issue 6 comments."
