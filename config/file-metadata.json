@@ -7,25 +7,25 @@
       "description": "Twenty-one regression tests covering input gating, blank response slots, reuse, stale-event protection, and publication."
     },
     ".github/workflows/issue-6-gh.yml": {
-      "description": "Issue 6 listener selecting standard, commit, or meta-instructor reusable workflows."
+      "description": "Issue 6 listener selecting standard, commit, or meta-instructor reusable workflows. Supports owner-edited commands in the first five reserved Issue 6 comments."
     },
     "docs/issue-6/README.md": {
-      "description": "Issue 6 command protocol and routed commit adapter."
+      "description": "Issue 6 command protocol and routed commit adapter. Supports owner-edited commands in the first five reserved Issue 6 comments."
     },
     "AGENTS.md": {
-      "description": "Agent guidance for fixed input, preprocessor, standard gh commands and commit adapter."
+      "description": "Agent guidance for fixed input, preprocessor, standard gh commands and commit adapter. Supports owner-edited commands in the first five reserved Issue 6 comments."
     },
     "README.md": {
-      "description": "CommandLine introduction and supported read-only and write-enabled Issue 6 routes."
+      "description": "CommandLine introduction and supported read-only and write-enabled Issue 6 routes. Supports owner-edited commands in the first five reserved Issue 6 comments."
     },
     "config/file-metadata.json": {
       "description": "Repository file metadata, including the Issue 6 commit adapter."
     },
     ".github/workflows/issue-6-standard.yml": {
-      "description": "Read-only reusable workflow for ordinary gh commands and normalization."
+      "description": "Read-only reusable workflow for ordinary gh commands and normalization. Supports owner-edited commands in the first five reserved Issue 6 comments."
     },
     ".github/workflows/issue-6-commit.yml": {
-      "description": "Write-enabled reusable workflow for validated Issue 7 comment-to-file commits."
+      "description": "Write-enabled reusable workflow for validated Issue 7 comment-to-file commits. Supports owner-edited commands in the first five reserved Issue 6 comments."
     },
     "runtime/issue6-route.cjs": {
       "description": "Owner-edited fixed-input preprocessor routing mutually exclusive gh, commit, and meta application commands."
@@ -52,7 +52,7 @@
       "description": "Controller lifecycle regression suite and per-session output append/isolation/legacy-migration tests."
     },
     "workspaces/meta-instructor/issue6-adapter.cjs": {
-      "description": "Meta application adapter selecting a distinct Issue 7 output comment per nonce and appending subsequent outputs by PATCHing that same comment."
+      "description": "Meta application adapter selecting a distinct Issue 7 output comment per nonce and appending subsequent outputs by PATCHing that same comment. Supports owner-edited commands in the first five reserved Issue 6 comments."
     },
     "workspaces/meta-instructor/README.md": {
       "description": "Meta protocol, state/outputs format, per-nonce output IDs, limits, verification."
@@ -61,7 +61,7 @@
       "description": "Router, listener, and reusable workflow installation manifest for the meta-instructor."
     },
     ".github/workflows/issue-6-meta.yml": {
-      "description": "Read-only-content/issues-write meta-instructor workflow running controller and console regressions before application transitions."
+      "description": "Read-only-content/issues-write meta-instructor workflow running controller and console regressions before application transitions. Supports owner-edited commands in the first five reserved Issue 6 comments."
     },
     "workspaces/meta-instructor/VERIFICATION.md": {
       "description": "Exact workflow test counts, live smoke-test receipts, and verification limits for the meta-instructor."
