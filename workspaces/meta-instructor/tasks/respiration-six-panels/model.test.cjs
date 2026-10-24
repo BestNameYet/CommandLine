@@ -46,3 +46,11 @@ test('rejects physically invalid mixtures and unstable numerical transport',()=>
  assert.throws(()=>m.simulate({dtSeconds:1,airwayCells:40}));
  assert.throws(()=>m.simulate({frcL:0.1,deadspaceL:0.15}));
 });
+
+test('body oxygen is consumed, CO2 is produced and N2O recirculates',()=>{
+ const r=model().simulate();
+ assert.ok(r.ledger.metabolicO2LSTPD>0);assert.ok(r.ledger.metabolicCO2LSTPD>0);
+ assert.ok(r.panels.at(-1).systemicVenousPO2<r.panels[0].systemicVenousPO2);
+ assert.ok(r.panels.at(-1).systemicVenousNitrousDryFraction>0);
+ assert.ok(r.checks.maxMassResidualL<1e-9);
+});
