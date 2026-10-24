@@ -11,8 +11,9 @@ and workflow registration lives in the existing repository integration paths.
 1. Create an Issue 7 comment containing exactly {"problem":"Your task here"}.
 2. Edit fixed Issue 6 input comment 6358997143:
    gh> meta start YOUR_UNIQUE_NONCE TASK_COMMENT_ID
-3. Read the resulting Issue 7 responseCommentId. It contains a request,
-   a complete returnSchema and a sessionCommentId.
+3. Read the Issue 7 responseCommentId selected by this session's start command.
+   Its `outputs` array contains successive requests and their returnSchema values;
+   its `state` contains the canonical context and current phase.
 4. Put the agent response JSON in an Issue 7 comment, then submit:
    gh> meta respond YOUR_UNIQUE_NONCE RESPONSE_COMMENT_ID
 5. Recover the current request without advancing:
@@ -27,6 +28,29 @@ No remote model service is assumed. The agent reading the request answers it,
 executes each explicitly authorized step with its own available tools, stops,
 and submits the report. This script orchestrates the conversation; it does
 not itself execute arbitrary agent-written code.
+
+
+## Session-owned output location
+
+Each `gh> meta start NONCE COMMENT_ID` selects **one new Issue #7 comment ID**
+for that session. It is *not* a global or hardcoded output comment ID.
+For later `respond` and `status` commands with the same nonce, the adapter
+retrieves that session comment and **PATCHes the same ID**. Its `outputs`
+array receives the new output after all previous outputs. The Issue #6
+`responseCommentId` continues to identify that same session-owned output.
+Two sessions with different nonces maintain independent comment IDs and
+separate output histories. The one shared Issue #6 input is only a command
+submission surface, not a common output location.
+
+The comment stores the authoritative `state` once. Individual `outputs`
+contain compact requests (instruction, authorization and returnSchema) without
+copying the full `request.context` into every output; the context remains
+inspectable in `state`. Existing sessions with a legacy single `request`
+are converted to an initial history entry on their next successful update.
+A rejected agent response appends a validation-failure output without
+advancing state. An unknown/invalid command that has no identifiable session
+may still produce an independent error comment. If GitHub refuses a write,
+the program cannot claim the attempted output was persisted.
 
 ## Protocol
 
@@ -67,9 +91,10 @@ verified. The okay-to-continue gate establishes structural compliance, not
 proof of external execution. Context sufficiency is an explicit agent
 assessment with follow-up rounds, not an omniscient automated judgment.
 
-Storage: at most 60,000 UTF-8 bytes per session comment; up to 30 questions
-per round, 100 total QA records, eight follow-up rounds, 50 plan steps and
-150 step reports. Exceeding limits fails without saving the proposed state.
+Storage: up to 30 questions per round, 100 total QA records, eight follow-up
+rounds, 50 plan steps and 150 step reports remain controller-defined limits.
+The previous application-specific 60,000-byte cutoff is removed. GitHub's
+actual issue-comment/API limits still apply; failed writes cannot be presumed saved.
 After a publication interruption, use status to recover the durable request.
 Do not reuse a nonce for a new task. Do not submit the next fixed-input
 command until the previous receipt is published and the prompt resets.
