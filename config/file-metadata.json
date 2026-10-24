@@ -65,6 +65,9 @@
     },
     "workspaces/meta-instructor/VERIFICATION.md": {
       "description": "Exact workflow test counts, live smoke-test receipts, and verification limits for the meta-instructor."
+    },
+    "workspaces/api-to-nodejs/PROJECT_INSTRUCTIONS.md": {
+      "description": "Project entry-point requiring current README.md and AGENTS.md plus verified retrieval of all Issue 8 comments before repository operations."
     }
   }
 }
