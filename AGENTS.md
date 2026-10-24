@@ -2,6 +2,16 @@
 
 ## Central job queue — required
 
+### Every user order must enter through Issue #6
+
+**An agent must not implement a user work order directly from the conversation. Every user order must first be issued or recorded through Issue #6 so that it is added to the central Issue #7 job queue.** This applies to new work, fixes, documentation edits, workflow changes, and later instructions that change existing work.
+
+1. Record the verbatim user prompt, interpreted intent, and submission nonce in a new job record, or append a follow-up prompt to its existing job record, using an Issue #6 queue-update command.
+2. Inspect the command's execution receipt and reread the central Issue #7 comment to verify that the order was actually saved. Submitting the command alone does not satisfy intake.
+3. Only after that verification may an agent take the next available unfinished step from the saved job and begin implementation using the authorized tools. Assignment remains per step, with a separate worker nonce.
+
+Direct file edits, commits, API calls, integrations, or runtimes must not be used to implement an unqueued order. They may be used to carry out an already recorded job under the applicable execution and workflow rules. Preserve the original prompt and submission nonce; record later user instructions before implementing their changes.
+
 **All agents receive their jobs from the single [Issue #7 job-queue comment](https://github.com/BestNameYet/CommandLine/issues/7#issuecomment-6389130786) (comment ID `6389130786`).** Read that exact comment before selecting or resuming work. Keep all jobs and their completion statuses in its JSON `jobs` array; update the same comment throughout each job.
 
 **Issue #6 is only for updates to this central Issue #7 queue.** Add or revise jobs and update their progress there; do not submit the actual work itself to Issue #6. Agents read their assignments from Issue #7 and perform the assigned work using the appropriate authorized integration or runtime. This rule supersedes older direct-work submission instructions and examples below, including direct `gh> commit` and `gh> meta` submissions. Those sections describe existing runner capabilities, not permission to bypass the queue.
