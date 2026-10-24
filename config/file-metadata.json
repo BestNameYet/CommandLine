@@ -19,7 +19,7 @@
       "description": "CommandLine overview with direct links to all five reserved inputs, submission and reset behavior, and output locations."
     },
     "config/file-metadata.json": {
-      "description": "Repository file metadata reflecting the five-input console documentation."
+      "description": "Repository file metadata including the seven active workflow copies in workspaces/api-to-nodejs/workflows/."
     },
     ".github/workflows/issue-6-standard.yml": {
       "description": "Read-only reusable workflow for ordinary gh commands and normalization. Supports owner-edited commands in the first five reserved Issue 6 comments."
@@ -68,6 +68,41 @@
     },
     "workspaces/api-to-nodejs/PROJECT_INSTRUCTIONS.md": {
       "description": "Project entry-point requiring current README.md and AGENTS.md plus verified retrieval of all Issue 8 comments before repository operations."
+    },
+    "workspaces/api-to-nodejs/workflows/issue-6-commit.yml": {
+      "description": "Exact snapshot of active workflow .github/workflows/issue-6-commit.yml; copied 2026-10-24.",
+      "source": ".github/workflows/issue-6-commit.yml",
+      "sourceBlobSha": "1920dec788ed477162602084642e268f1574bfe6"
+    },
+    "workspaces/api-to-nodejs/workflows/issue-6-gh.yml": {
+      "description": "Exact snapshot of active workflow .github/workflows/issue-6-gh.yml; copied 2026-10-24.",
+      "source": ".github/workflows/issue-6-gh.yml",
+      "sourceBlobSha": "a1df5624dd8bdda69eb27690907b9d5523781ad9"
+    },
+    "workspaces/api-to-nodejs/workflows/issue-6-meta.yml": {
+      "description": "Exact snapshot of active workflow .github/workflows/issue-6-meta.yml; copied 2026-10-24.",
+      "source": ".github/workflows/issue-6-meta.yml",
+      "sourceBlobSha": "97149e569c979dbfcb490f5812180d616d3aac12"
+    },
+    "workspaces/api-to-nodejs/workflows/issue-6-standard.yml": {
+      "description": "Exact snapshot of active workflow .github/workflows/issue-6-standard.yml; copied 2026-10-24.",
+      "source": ".github/workflows/issue-6-standard.yml",
+      "sourceBlobSha": "40582eb42793d82df9c289275917d24a2cd3c752"
+    },
+    "workspaces/api-to-nodejs/workflows/respiration-model.yml": {
+      "description": "Exact snapshot of active workflow .github/workflows/respiration-model.yml; copied 2026-10-24.",
+      "source": ".github/workflows/respiration-model.yml",
+      "sourceBlobSha": "dc587b21a5d8eb9d011c5aae4f220ccd42e90aa3"
+    },
+    "workspaces/api-to-nodejs/workflows/run-delete-on-file.yml": {
+      "description": "Exact snapshot of active workflow .github/workflows/run-delete-on-file.yml; copied 2026-10-24.",
+      "source": ".github/workflows/run-delete-on-file.yml",
+      "sourceBlobSha": "dca50b006a90bcab80107447f460f15952bb159e"
+    },
+    "workspaces/api-to-nodejs/workflows/run-js.yml": {
+      "description": "Exact snapshot of active workflow .github/workflows/run-js.yml; copied 2026-10-24.",
+      "source": ".github/workflows/run-js.yml",
+      "sourceBlobSha": "2aa58fa59700d162374d55ee669cf718ea657dc5"
     }
   }
 }
