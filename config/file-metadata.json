@@ -103,6 +103,9 @@
       "description": "Exact snapshot of active workflow .github/workflows/run-js.yml; copied 2026-10-24.",
       "source": ".github/workflows/run-js.yml",
       "sourceBlobSha": "2aa58fa59700d162374d55ee669cf718ea657dc5"
+    },
+    "workspaces/api-to-nodejs/workflow-sha-and.cjs": {
+      "description": "Node.js Git blob SHA comparison table for workspace workflow copies and .github/workflows, per-file booleans, cumulative AND and overall result; no API dependency."
     }
   }
 }
