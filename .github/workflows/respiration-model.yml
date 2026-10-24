@@ -1,0 +1,50 @@
+name: Respiration Model Verification
+on:
+  push:
+    paths:
+      - 'workspaces/meta-instructor/tasks/respiration-six-panels/**'
+      - '.github/workflows/respiration-model.yml'
+  workflow_dispatch:
+permissions: {}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run numerical tests
+        id: tests
+        shell: bash
+        run: |
+          set +e
+          node --test workspaces/meta-instructor/tasks/respiration-six-panels/model.test.cjs > test-output.txt 2>&1
+          result=$?
+          echo "exitCode=$result" >> "$GITHUB_OUTPUT"
+          cat test-output.txt
+          exit 0
+      - name: Calculate endpoint and sensitivity results
+        if: steps.tests.outputs.exitCode == '0'
+        run: node workspaces/meta-instructor/tasks/respiration-six-panels/model.cjs > model-output.json
+      - name: Publish exact test output and calculated results
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          TEST_EXIT: ${{ steps.tests.outputs.exitCode }}
+        with:
+          script: |
+            const fs = require('fs');
+            const testOutput = fs.existsSync('test-output.txt') ? fs.readFileSync('test-output.txt','utf8') : 'Test output unavailable';
+            const result = fs.existsSync('model-output.json') ? JSON.parse(fs.readFileSync('model-output.json','utf8')) : null;
+            const body = JSON.stringify({type:'respiration-model-verification',nonce:'respiration-six-panels-20261023-01',commitSha:context.sha,runId:context.runId,testExitCode:process.env.TEST_EXIT === '' ? null : Number(process.env.TEST_EXIT),testOutput,result},null,2);
+            const saved = await github.rest.issues.createComment({...context.repo,issue_number:7,body});
+            core.info('Verification comment: '+saved.data.html_url);
+      - name: Require numerical tests to pass
+        if: steps.tests.outputs.exitCode != '0'
+        run: exit 1
