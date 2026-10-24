@@ -12,7 +12,7 @@ jobs:
       contents: read
       issues: write
     env:
-      ISSUE6_INPUT_COMMENT_ID: '6358997143'
+      ISSUE6_INPUT_COMMENT_ID: ${{ contains(fromJSON('[6358997143,6358997306,6359048816,6359050701,6359050871]'), github.event.comment.id) && github.event.comment.id || '6358997143' }}
     steps:
       - uses: actions/checkout@v4
         with:
