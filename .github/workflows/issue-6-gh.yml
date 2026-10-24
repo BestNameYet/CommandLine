@@ -43,3 +43,11 @@ jobs:
       contents: write
       issues: write
     uses: ./.github/workflows/issue-6-commit.yml
+
+  meta-instructor:
+    needs: preprocess
+    if: ${{ needs.preprocess.outputs.route == 'meta' }}
+    permissions:
+      contents: read
+      issues: write
+    uses: ./.github/workflows/issue-6-meta.yml
