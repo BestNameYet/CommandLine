@@ -83,3 +83,13 @@ Run the focused regression checks with `node --test tests/issue6-gh-command.test
 
 The workflow `.github/workflows/issue-6-gh.yml` now preprocesses Issue #6 events with `runtime/issue6-route.cjs` and calls one reusable workflow. `.github/workflows/issue-6-standard.yml` retains the existing read-only `gh` executor and comment normalization. `.github/workflows/issue-6-commit.yml` is a separate write-enabled workflow supporting `gh> commit <commentID>`. It validates a JSON file object in Issue #7 and commits its `filename` and `body` to this repository. See [COMMIT_ADAPTER.md](COMMIT_ADAPTER.md) for the exact accepted format and safeguards.
 
+
+## Meta-instructor session output
+
+Meta-instructor commands use the same fixed Issue #6 input comment, but the
+meta-instructor chooses one distinct Issue #7 output comment ID per nonce.
+All later responses and status outputs for that session append to its
+`outputs` array by updating that ID in place; `responseCommentId` in Issue #6
+refers to the same output for the lifetime of the session. Independent meta
+instances must not share one canonical output ID. See
+[meta-instructor README](../../workspaces/meta-instructor/README.md).
