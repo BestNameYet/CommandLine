@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('node:fs');
 const core=require('./controller.cjs');
-const INPUT='6358997143',SLOT='<!-- issue6-response-slot:available -->';
+const INPUT=process.env.ISSUE6_INPUT_COMMENT_ID || '6358997143',SLOT='<!-- issue6-response-slot:available -->';
 async function api(repo,path,method='GET',data) {
  const r=await fetch('https://api.github.com/repos/'+repo+'/'+path,{method,
  headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','Content-Type':'application/json'},
