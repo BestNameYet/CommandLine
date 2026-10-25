@@ -114,7 +114,10 @@
       "description": "Evidence-based cross-repository idea and technique inventory procedure, prior GeminiSupervisor inventory reference, coverage checkpoints and status distinctions."
     },
     "workspaces/api-to-nodejs/research/meta-screen-parity-plan.md": {
-      "description": "Pinned StateMachines normal/Gemini/Mirror reference, verified current-meta gaps, proposed architecture and implementation/acceptance plan; product implementation pending."
+      "description": "Reviewed StateMachines normal/Gemini/Mirror parity design and implementation plan covering canonical persistence, initialization, filtering, workers, invocation reports and publication/recovery; product implementation pending."
+    },
+    "workspaces/api-to-nodejs/research/context-transmission-report.md": {
+      "description": "Primary-source study of Issues 6–8 context transport, measured payload snapshots, observed truncation, and dated MCP/StateMachines persistence/replay lineage; original conception unresolved."
     }
   }
 }
