@@ -120,7 +120,7 @@
       "description": "Primary-source study of Issues 6–8 context transport, measured payload snapshots, observed truncation, and dated MCP/StateMachines persistence/replay lineage; original conception unresolved."
     },
     "workspaces/api-to-nodejs/research/idea-inventory-report.md": {
-      "description": "49-record pinned current-source inventory across MCP-Collaborative and StateMachines, 18 coverage dispositions, 70 evidence paths/hashes, prior inventory preservation and explicit verification/history limits."
+      "description": "49-record pinned MCP-Collaborative/StateMachines inventory with18 coverage dispositions and70 evidence references; AppendixA adds8 functional categories, complete49-idea level/role crosswalk,49 typed relationships,9 derived abstractions and7 conditional conflict tests. Source/specification/test/historical distinctions and non-exhaustive all-pairs limits retained."
     }
   }
 }
