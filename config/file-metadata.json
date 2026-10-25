@@ -118,6 +118,9 @@
     },
     "workspaces/api-to-nodejs/research/context-transmission-report.md": {
       "description": "Primary-source study of Issues 6–8 context transport, measured payload snapshots, observed truncation, and dated MCP/StateMachines persistence/replay lineage; original conception unresolved."
+    },
+    "workspaces/api-to-nodejs/research/idea-inventory-report.md": {
+      "description": "49-record pinned current-source inventory across MCP-Collaborative and StateMachines, 18 coverage dispositions, 70 evidence paths/hashes, prior inventory preservation and explicit verification/history limits."
     }
   }
 }
