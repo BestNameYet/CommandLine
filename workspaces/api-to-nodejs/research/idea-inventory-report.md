@@ -1571,3 +1571,249 @@ The JSON below is the structured handoff. Each evidence entry provides an exact 
 }
 ```
 
+
+## Appendix A — Fundamental categories and relationships
+
+This appendix compares the existing **49 catalog records**. It adds an analytical organization, not new implementation claims, activated requirements or an origin timeline. The eight categories and D1–D9 abstractions are editorial deductions from the mechanisms already evidenced above. Existing status labels remain unchanged.
+
+The central distinction is **relationship versus identity**: two ideas may be analogous and compatible at once, yet differ in authority, fidelity, storage guarantees or abstraction level. No unconditional direct contradiction between catalog records was established in this review. That finding does not prove universal compatibility across all 1,176 unordered pairs.
+
+### A1. How relationships are decided
+
+| Relation | Decision rule | What it does not establish |
+| --- | --- | --- |
+| Compatible / complementary | The mechanisms can serve the same composition without violating their stated constraints; complementary mechanisms answer different necessary questions. | Successful integration, existing wiring, or equivalent guarantees. |
+| Conditional compatibility / conflict | Coexistence depends on an explicit boundary, actor, version, ordering, input contract or acceptance criterion. | That the conflict condition occurs in either current repository. |
+| Contradiction | The same actor/object/version/stage and acceptance criterion carry obligations that cannot both hold. | Mere difference of implementation, tradeoff, terminology or layer. |
+| Analogy | The mechanisms share a structural pattern while retaining stated differences. | Replacement, identical outputs, shared code, or historical influence. |
+| Conceptual specialization | A concrete mechanism instantiates an explicitly named more general pattern. | Formal subtyping, code inheritance, or a proved refinement relation. |
+| Supports / used by | One supplies an input, capability or execution layer used by another; direct use is distinguished from possible composition. | That supplying a prerequisite proves the downstream result. |
+| Alternative / variant | Different choices address a shared role or contract. | That both choices must run simultaneously or must yield the same result. |
+| Not equivalent | A particular tempting substitution would lose an essential property. | Incompatibility when the ideas serve different stages or scopes. |
+
+Compatibility and analogy are not generally transitive. If A composes with B and B with C, the combined A/B/C constraints still need checking. Unlisted pairs are **not assessed**, not automatically orthogonal, compatible or contradictory.
+
+### A2. Eight fundamental functional categories
+
+A primary category is a navigation choice based on an idea's dominant role. Secondary roles in A4 make overlap explicit. These are practical architectural categories, not a claim that nature has exactly eight independent kinds of idea.
+
+| Code | Fundamental category | Question it answers | Primary members |
+| --- | --- | --- | --- |
+| G | Governance and specification | Which rules and documents define the obligation? | MCP-001, SM-003, SM-032 (3) |
+| T | Authority and progression | Who may advance what, and under which gates? | MCP-002, MCP-003, SM-001, SM-011, SM-013, SM-016 (6) |
+| S | State, identity and continuity | What persists, how is it versioned, and what survives retry or concurrency? | MCP-005, MCP-006, SM-010, SM-012, SM-017, SM-021 (6) |
+| P | Projection and representation | What form of authoritative material is presented, and to whom? | MCP-004, SM-007 (2) |
+| V | Evidence and verification | What observable evidence or explicit comparison supports a claim? | MCP-007, SM-002, SM-006, SM-008, SM-009, SM-020 (6) |
+| X | Execution, transport and resources | How does an authorized operation reach an executor or dependency? | MCP-008, MCP-009, MCP-011, SM-004, SM-014, SM-015, SM-018, SM-019, SM-027, SM-031, SM-035, SM-038 (12) |
+| I | Inference and transformation | How are proposals, features, similarities, groups or interpretations derived? | SM-005, SM-022, SM-023, SM-024, SM-025, SM-026, SM-029, SM-030, SM-034, SM-036 (10) |
+| M | Observation, measurement and indexing | What is counted, labeled, located or calibrated? | MCP-010, SM-028, SM-033, SM-037 (4) |
+
+The useful division is: **rules; authority; continuity; representation; evidence; action; inference; measurement**. For example, a nonce is identity/continuity, not authorization by itself; a rendered screen is representation, not execution; and a successful reconstruction is evidence for fidelity, not proof of comprehension.
+
+### A3. Orthogonal comparison axes
+
+Here, orthogonal means independently answerable design questions, not mathematical or statistical independence.
+
+| Axis | Values or question | Why it changes the comparison |
+| --- | --- | --- |
+| Function | G/T/S/P/V/X/I/M | Two mechanisms in different categories can be complementary; matching categories alone does not make them equivalent. |
+| Abstraction level | L0 principle/invariant; L1 contract/protocol/model; L2 mechanism/algorithm/runtime; L3 application/integration; L4 recorded artifact/result | Compare a principle with a mechanism as an implementation relationship, not as competing implementations. |
+| Decision authority | Proposal, semantic assessment, deterministic acceptance, durable commit | A model proposal and a rule-enforced commit can coexist; competing final authorities for the same transition require resolution. |
+| State and recipient | Authoritative state, restricted actor view, worker context, public output | Full internal state and limited external visibility can both be correct. |
+| Temporal stage | Definition, initialization, request, execution, publication, readback, replay, retention | Deleting a branch after sealing evidence differs from deleting the sole evidence before verification. |
+| Unit and scope | Actor, assignment, action, transaction, request, run, source version, corpus item | Action IDs, worker nonces and run nonces cannot be substituted merely because all are identifiers. |
+| Fidelity and guarantee | Exact equality, integrity/provenance, approximate similarity, structural validity, semantic adequacy | High similarity is not identity; valid JSON is not task success; a hash identifies bytes rather than their truth. |
+| Evidence strength | Specification, source implementation, test definition, historical result, live observation | A relation inferred from code does not become a freshly verified integration or a completed live task. |
+
+### A4. Complete 49-idea crosswalk
+
+L0–L4 describe the dominant level of the catalog entry; multiple values indicate a composite entry. L4 on SM-006 concerns its historical final result, while L2 concerns the checkpointing runner. Secondary codes express additional roles, not new evidence-strength labels. Each linked ID resolves to a pinned primary source; the original record retains its complete evidence list and uncertainties.
+
+| Idea and primary source | Name | Primary | Level | Secondary roles |
+| --- | --- | --- | --- | --- |
+| [MCP-001](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/APPLICATION_PROFILE_STANDARD.md) | Specification-first application profiles | G | L0/L1 | T, V |
+| [MCP-002](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/plugins/collaborative-tic-tac-toe/src/collaborative_ttt/domain.py) | Pure deterministic transition boundary | T | L2 | V |
+| [MCP-003](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/plugins/collaborative-tic-tac-toe/src/collaborative_ttt/domain.py) | Authoritative execution pointer | T | L1/L2 | S |
+| [MCP-004](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/plugins/collaborative-tic-tac-toe/src/collaborative_ttt/projection.py) | Allow-listed actor projections | P | L2 | S, V |
+| [MCP-005](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/plugins/collaborative-tic-tac-toe/src/collaborative_ttt/repository.py) | Atomic state/events/environments persistence | S | L2 | T, V |
+| [MCP-006](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/plugins/collaborative-tic-tac-toe/src/collaborative_ttt/repository.py) | Retry identity and stale-state separation | S | L2 | T, V |
+| [MCP-007](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/plugins/collaborative-tic-tac-toe/src/collaborative_ttt/repository.py) | Genesis and event replay consistency | V | L2 | S |
+| [MCP-008](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/plugins/collaborative-tic-tac-toe/src/collaborative_ttt/mcp_server.py) | Small bundled STDIO MCP surface | X | L3 | T |
+| [MCP-009](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/.github/workflows/dispatch-relay-post.yml) | Commit-trigger HTTP relay | X | L3 | M |
+| [MCP-010](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/.github/workflows/count-temp-text.yml) | Separate token and text counts | M | L2/L3 | — |
+| [MCP-011](https://github.com/BestNameYet/MCP-Collaborative/blob/05ee655375695fbf48e0eeaab5ef2c561a565f78/Code.gs) | Spreadsheet-addressed function iterator | X | L3 | T, S |
+| [SM-001](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GeminiSupervisor/send-to-gemini.js) | Nonce-scoped supervisory state machine | T | L3 | S, V, I |
+| [SM-002](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GeminiSupervisor/send-to-gemini.js) | Repository-grounded execution claims | V | L2 | P |
+| [SM-003](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GeminiEvaluation/evaluate-supervisor.js) | Paired specification/runtime revision | G | L1/L2 | V |
+| [SM-004](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GeminiEvaluation/README.md) | Isolated nextmessage devices | X | L1/L3 | S |
+| [SM-005](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GeminiEvaluation/hierarchical-runtime/audit.js) | Hierarchical evaluation with retry policies | I | L2 | T, X |
+| [SM-006](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GeminiEvaluation/evaluations/stage1_current_feature_inventory_20261002_1/execution/final.json) | Checkpointed historical feature inventory | V | L2/L4 | S, I |
+| [SM-007](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GeminiSupervisor/scripts/sync-stable-readers.js) | Ordered readers with source provenance | P | L2 | V |
+| [SM-008](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GeminiSupervisor/scripts/truth-challenge-engine.js) | Controlled-damage truth challenge | V | L2/L3 | P |
+| [SM-009](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GeminiSupervisor/scripts/live-ground-truth-reading-room.js) | PNG locator challenge and deterministic solver | V | L3 | P |
+| [SM-010](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/AGENTS%20Procedure/gemini-workflow.js) | Persisted interactive modes and recovery | S | L3 | T, P, X |
+| [SM-011](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/AGENTS%20Procedure/gemini-workflow.js) | Outcome/process gaps and stall control | T | L1/L2 | I, V |
+| [SM-012](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/AGENTS%20Procedure/gemini-workers.js) | Worker identity with serialized shared mutations | S | L2/L3 | T, P, X |
+| [SM-013](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/AGENTS%20Procedure/mirror-workflow.js) | Mirror mode control variant | T | L3 | S, P |
+| [SM-014](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/GitHub%20Command%20Issue/issue-command.js) | Owner-scoped command and receipt surface | X | L3 | T, V |
+| [SM-015](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/GitHub%20Command%20Issue/issue-command.js) | Native reads with workspace boundaries | X | L2 | V |
+| [SM-016](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/.github/workflows/sbe-delete-branch.yml) | Seal/delete/evaluate lifecycle | T | L1/L3 | S, V, X |
+| [SM-017](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/untrusted%20AI/meta-procedure/AIChannel/aichannel/runtime.py) | Version-pinned transaction behaviors | S | L2 | T, X |
+| [SM-018](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/untrusted%20AI/meta-procedure/Procedures/JS%20Runner/js-runner.js) | Sequential meta-procedure script adapter | X | L2 | T |
+| [SM-019](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/metaprocedures/procedures/AchiveExtraction/apps-script-source.js) | Ordered archive operations and independent readback | X | L3 | V, S |
+| [SM-020](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/Conversation%20Archive%20Analysis/README.md) | Question-specific evidence and coverage ledger | V | L1 | G, M |
+| [SM-021](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/Conversation%20Archive%20Analysis/parallel-gemini/run_task.py) | Independent multimodal analysis jobs | S | L3 | X, V |
+| [SM-022](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/Conversation%20Archive%20Analysis/tfidf-nmf/run.py) | Unsupervised lexical topic baseline | I | L2 | P, V |
+| [SM-023](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/Conversation%20Archive%20Analysis/topic-merge/merge.py) | Approximate topic catalog consolidation | I | L2 | P |
+| [SM-024](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/Conversation%20Archive%20Analysis/topic-clustering/cluster.py) | Hierarchical groups and unique conversation counts | I | L2 | M, P |
+| [SM-025](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/Conversation%20Archive%20Analysis/conversation-classifier-12/classify.py) | Frozen-prototype conversation classifier | I | L2 | P |
+| [SM-026](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Workflow%20Interactive%20Procedures/Conversation%20Archive%20Analysis/bertopic/run.py) | Embedding topic fit/predict with source identities | I | L2 | P |
+| [SM-027](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/SeleniumServer/run.cjs) | Correlated browser operation artifacts | X | L3 | M, V |
+| [SM-028](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/AudioClipSelector/listen_and_label.html) | Event-time audio labeling with explicit timing | M | L3 | S, X |
+| [SM-029](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/AudioEmotionAnalysis/analyze.py) | Integrity-checked speech emotion/acoustics | I | L3 | M, V |
+| [SM-030](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/matching/state_machine.py) | Image vector comparison state machine | I | L3 | P |
+| [SM-031](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/matching/published_artifact_retrieval.py) | Manifest-driven runtime acquisition | X | L2/L3 | V, S |
+| [SM-032](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/Main%20Instructions/AGENTS%20Design/README.md) | Canonical instruction design versus inactive drafts | G | L1 | P |
+| [SM-033](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/scripts/update_repository_manifest.py) | Metadata-preserving repository/project indexes | M | L2 | P |
+| [SM-034](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/untrusted%20AI/meta-procedure/AIChannel/aichannel/operations.py) | Fixed primitive registry with lexical retrieval | I | L2 | P, X |
+| [SM-035](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/untrusted%20AI/meta-procedure/Procedures/PromptGemini/rebuild-hidden-shared-page/gemini-message-executor.js) | Configurable prompt executor and rebuild validator | X | L3 | S, V |
+| [SM-036](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/AudioEmotionAnalysis/transcribe.py) | Independent timestamped ASR | I | L3 | M, V |
+| [SM-037](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/TokenizerCalibration/stage1-divide.js) | Exact token calibration and structural packing | M | L2/L3 | P, X |
+| [SM-038](https://github.com/BestNameYet/StateMachines/blob/6ad9089083248ab3b9ed9d2fb91a9bc810345c0b/ChatMachines/GitHubNodeTest/run.js) | Node runtime probe that invokes substantive procedure | X | L3 | M |
+
+### A5. Relationship register
+
+These **49 selected relations cover every catalog idea**. They are reasoned comparisons of the cited mechanisms, not runtime interoperability results. Each row's IDs refer to A4 and the original evidence records. A pair may carry several relation types.
+
+| Relation | Ideas | Type | Reason and boundary |
+| --- | --- | --- | --- |
+| R01 | MCP-001 ↔ SM-003 | analogy/complement | Both keep specification and implementation aligned; lifecycle governance differs from paired revision and preserved-pointer enforcement. |
+| R02 | MCP-001 ↔ SM-032 | analogy/compatible | Both distinguish authoritative requirements from working documents; a canonical repository draft is not thereby an activated account instruction. |
+| R03 | MCP-002 ↔ SM-001 | analogy/conditional-compatible | Both guard state advancement. Game transitions are deterministic; supervisory acceptance includes model judgment. Keep proposal/judgment separate from the deterministic commit boundary. |
+| R04 | MCP-003 ↔ SM-012 | analogy/conditional-compatible | Turn eligibility and worker assignment both bind authority to identity. A global single turn and concurrent workers need distinct scopes or serialized shared commits. |
+| R05 | MCP-004 ↔ SM-012 | analogy/conditional-compatible | Both deliver recipient-specific context. Bounded worker context alone does not prove the allow-list/fail-closed privacy property of actor projection. |
+| R06 | MCP-005 ↔ SM-017 | analogy | Both persist version-sensitive state using SQLite. Shared technology does not prove identical atomicity across state, events and cached results. |
+| R07 | MCP-005 ↔ SM-012 | complement | Independent work can run concurrently while shared mutation is serialized; a process-level promise chain is not a database transaction. |
+| R08 | MCP-006 ↔ SM-010 | analogy/complement | Cached request results and saved workflow continuation both avoid repeating finished work; screen recovery alone is not general side-effect idempotency. |
+| R09 | MCP-006 ↔ SM-035 | conditional-compatible | Dispatch retry needs effect identity or downstream deduplication for an exactly-once claim. A run nonce and retry loop alone do not provide it. |
+| R10 | MCP-007 ↔ SM-008 | analogy | Both reconstruct and compare with a trusted baseline: accepted state events versus damaged document projection. Exactness applies to different objects. |
+| R11 | MCP-007 ↔ SM-002 | complement | Replay establishes internal event/state consistency; live repository checks establish observable source/object evidence. Neither proves every task claim. |
+| R12 | MCP-007 ↔ SM-007 | complement | Reconstruction and source-version provenance answer different questions and can be checked together. |
+| R13 | MCP-008 ↔ SM-014 | analogy | Both expose controlled operations through a transport: STDIO tools versus issue envelopes and receipts. Their credential and author checks remain transport-specific. |
+| R14 | MCP-008 ↔ SM-017 | analogy/layering | A stable external operation surface can front durable transaction behavior; generic configurable behavior is not a literal superclass of the game plugin. |
+| R15 | MCP-009 ↔ MCP-011 | conditional-compatible | Exact-byte HTTP relay can invoke the spreadsheet interpreter when the endpoint is wired to that deployment. Receipt of HTTP data does not establish the spreadsheet effect. |
+| R16 | MCP-009 ↔ SM-004 | analogy | Both use durable artifact changes to route work; separate input/output devices and downstream acceptance remain additional contracts. |
+| R17 | MCP-009 ↔ SM-014 | analogy | Transport-triggered action plus observable response is a common pattern; a POST relay is not equivalent to an authenticated issue command catalog. |
+| R18 | MCP-010 ↔ SM-037 | analogy/not-equivalent | Both measure context size, but o200k_base and Gemini countTokens are different units; transformed representations also change the measured object. |
+| R19 | MCP-011 ↔ SM-018 | analogy | Both interpret ordered procedure work; named-range next_address control differs from sequential child programs and exit outcomes. |
+| R20 | MCP-011 ↔ SM-034 | analogy/conditional-policy-conflict | Arbitrary function-source evaluation and a fixed primitive registry are different execution policies. They conflict only if imposed simultaneously on the same execution boundary. |
+| R21 | SM-001 ↔ SM-011 | analogy/complement | Step gates and outcome/process-gap control are two forms of progress control; structural acceptance must not become proof of semantic goal completion. |
+| R22 | SM-003 ↔ SM-017 | compatible/not-conflicting | New paired specification/runtime versions can be introduced while existing transactions remain pinned to their old configuration. |
+| R23 | SM-005 ↔ SM-006 | pattern-specialization | The historical inventory applies hierarchical evaluation/checkpoint principles to a bounded corpus. This does not assert source-code inheritance or a fresh successful run. |
+| R24 | SM-005 ↔ SM-011 | analogy | Both govern iteration/termination, but evaluation-round acceptance and three operator turns without gap reduction are different stopping criteria. |
+| R25 | SM-005 ↔ SM-021 | analogy | Both partition work and consolidate results. Hierarchical semantic evaluation is not the same as parallel multimodal collection and missing-job accounting. |
+| R26 | SM-007 ↔ SM-008 | supports | Versioned ordered readers provide provenance for the controlled-damage challenge; challenge success remains narrower than comprehension. |
+| R27 | SM-008 ↔ SM-009 | analogy/not-equivalent | Both are attempted reading/fidelity controls; distributed damage and randomized PNG locators differ. The companion image solver blocks an inference from locator success to semantic understanding. |
+| R28 | SM-010 ↔ SM-013 | variant/common-contract | Mirror supplies producer-authored screens without Gemini; generated mode uses a model producer. Shared screen/return concepts do not permit two producers to replace the same outstanding request. |
+| R29 | SM-010 ↔ SM-017 | analogy | Both support saved continuation, with different state ownership/version models and storage guarantees. |
+| R30 | SM-014 ↔ SM-015 | supports | The command surface uses native path-bounded reads for eligible operations; local file access does not replace genuinely remote GitHub operations. |
+| R31 | SM-018 ↔ SM-038 | used-by | The Node entry invokes the script adapter and archive procedure. Its diagnostic output does not make execution a harmless read-only probe. |
+| R32 | SM-018 ↔ SM-019 | supports | The script-adapter/Apps Script chain can carry archive operations; child exit success still requires independent effect readback. |
+| R33 | SM-019 ↔ SM-002 | complement/coverage-gap | Archive effects need Drive readback; repository-only evidence checks cannot by themselves verify those remote effects. |
+| R34 | SM-020 ↔ SM-021 | complement | A coverage ledger can account for missing/failed parallel jobs. Collected output is not automatically analyzed or semantically verified output. |
+| R35 | SM-020 ↔ SM-033 | complement/not-equivalent | Path indexes locate material; question-specific ledgers record how far it was inspected and understood. Listing a file does not establish semantic coverage. |
+| R36 | SM-022 ↔ SM-026 | analogy/alternative | NMF and BERTopic provide alternative unsupervised topic-discovery approaches. Their representations, memberships and labels are not interchangeable. |
+| R37 | SM-022 ↔ SM-023 | compatible-pipeline | Local topic outputs can be consolidated after vocabulary/weight alignment. The consolidated catalog is not globally refitted NMF. |
+| R38 | SM-023 ↔ SM-024 | analogy/alternative | Complete-linkage consolidation and average-linkage hierarchy solve related grouping tasks with different merge semantics; an identical partition is not guaranteed. |
+| R39 | SM-024 ↔ SM-025 | conditional-compatible-pipeline | Groups may supply frozen classification prototypes if vocabulary, centroid and input contracts agree. Counting memberships and assigning new conversations remain distinct stages. |
+| R40 | SM-025 ↔ SM-030 | analogy | Both compare representations against fixed references: conversation centroids versus anchor-image vectors. Distances and acceptance thresholds are domain-specific. |
+| R41 | SM-025 ↔ SM-026 | not-equivalent | Classifying into fixed prototypes and learning unsupervised groups are different learning tasks, not simply higher/lower versions of one algorithm. |
+| R42 | SM-029 ↔ SM-036 | compatible/not-equivalent | Emotion/acoustic estimates and independent ASR can analyze the same hash-checked audio. Neither output proves the other, nor a person's internal feelings. |
+| R43 | SM-030 ↔ SM-031 | supports | Manifest-verified acquisition supplies runtime/model resources for image comparison; byte integrity does not prove model quality or application readiness. |
+| R44 | SM-034 ↔ SM-030 | analogy | Lexical retrieval and image ranking instantiate representation-plus-similarity. Similarity does not establish identity, truth or task success. |
+| R45 | SM-035 ↔ SM-010 | analogy | Both package context for model calls and preserve run results; prompt execution and interactive screen progression have different return/control contracts. |
+| R46 | SM-027 ↔ SM-028 | conditional-compatible | Browser automation can exercise the audio labeling UI if harness selectors/input contracts agree. This is composability, not a claim that the two entry points are already wired together. |
+| R47 | SM-006 ↔ SM-020 | complement | The historical 41-feature result is evidence for its own corpus; a coverage ledger prevents treating it as complete cross-repository analysis. |
+| R48 | SM-031 ↔ SM-007 | analogy | Both bind derived/acquired artifacts to source identity. Model-file hashes and reader provenance provide integrity, not semantic validity. |
+| R49 | SM-016 ↔ SM-002 | conditional-compatible | Sealed evaluation can coexist with source-grounded verification if the required version/evidence survives in an authorized immutable form. Deleting the sole required evidence before verification creates a conflict. |
+
+In directional entries, “supports” reads left-to-right; “used-by” means the left mechanism is used by the right application. The ↔ notation otherwise denotes comparison, not a claim of bidirectional code dependency.
+
+### A6. Abstraction ladders
+
+The left column is a **derived conceptual parent**, not an additional recovered historical idea. Read each row as general pattern → concrete manifestations. A recorded artifact such as the SM-006 final inventory is an output of a process; it is not a more general abstraction than its runtime.
+
+| Derived concept | More general pattern | Concrete manifestations | Limit on the generalization |
+| --- | --- | --- | --- |
+| D1 | Guarded state advancement | MCP-002, MCP-003, SM-001, SM-010, SM-011, SM-013, SM-017 | Common protocol concept; game rules, evaluator judgments, generated screens and registry behaviors still need different domain validators. |
+| D2 | Durable identity and continuation | MCP-005, MCP-006, SM-006, SM-010, SM-012, SM-017, SM-035 | Persistence, replay, retry and worker identity are specializations of continuity; they are not interchangeable guarantees. |
+| D3 | Materialized context from an authoritative source | MCP-004, SM-007, SM-010, SM-012 | Projection, ordered reading and context replay share representation concerns; only some enforce recipient secrecy. |
+| D4 | Comparison against an explicit reference | MCP-007, SM-002, SM-007, SM-008, SM-009, SM-031 | Event replay, object checks, reader provenance, reconstruction challenges and artifact hashes verify different properties of different objects. |
+| D5 | Interpreted procedure control | MCP-011, SM-017, SM-018, SM-034 | Named-range next addresses, versioned JSON behavior, child-script sequences and fixed primitives are different control languages, with different permissions. |
+| D6 | Representation followed by similarity or grouping | SM-022, SM-023, SM-024, SM-025, SM-026, SM-030, SM-034 | Shared computational pattern; factorization, linkage, centroid assignment, embeddings and lexical ranking remain distinct algorithms/tasks. |
+| D7 | Requested action, execution and observed effect | MCP-009, SM-014, SM-018, SM-019, SM-027, SM-035, SM-038 | Transport/exit receipts and effect readback are distinct stages. Some systems implement more of this chain than others. |
+| D8 | Specification as a constraint on implementation | MCP-001, SM-003, SM-020, SM-032 | Standards, preserved pointers, evidence-coverage rules and working-copy authority instantiate governance at different scopes. |
+| D9 | Measurement with an explicit unit and identity | MCP-010, SM-024, SM-028, SM-029, SM-033, SM-036, SM-037 | Token counts, conversation counts, labels, signal estimates, indexes and timestamps need identified units/objects; they do not all measure semantic truth. |
+
+An explicit reference need not be an independent source. MCP-007 replays records from the same repository database; that checks internal consistency, not independent corroboration of external events.
+
+This is where many apparent duplicates separate cleanly. MCP-005 and SM-017 are analogous durable-state mechanisms under D2; neither is shown to be a literal abstraction of the other. SM-025 and SM-030 share D6 while operating on different domains. SM-025 versus SM-026 differs mainly by learning task (assign to fixed prototypes versus learn groups), not by a simple “higher-level/lower-level” ordering.
+
+### A7. Conditional contradictions and their resolutions
+
+No row below asserts a present unconditional contradiction. Each names the exact condition that would make obligations incompatible. Whether that condition is active must be established from the actual actor, payload, version and acceptance rules.
+
+| Case | Ideas | Tension | Conflict exists only when… | Compatible separation or resolution |
+| --- | --- | --- | --- | --- |
+| K1 | MCP-004, SM-008, SM-010, SM-012 | Restricted view versus full context | The same recipient must both be denied fields and receive an unredacted object containing them. | Apply the visibility projection before transmission; trusted internal full-state processing and actor-visible context are different scopes. |
+| K2 | MCP-002, MCP-003, SM-001, SM-005, SM-035 | Competing final transition authorities | A model and a deterministic rule must have incompatible final authority over the same state transition. | Let models propose or assess; make the acceptance/commit boundary explicit. A model judgment used as an input does not eliminate deterministic transition mechanics. |
+| K3 | MCP-011, SM-034 | Open code versus closed operation registry | One execution boundary must accept arbitrary cell-defined functions while permitting only the fixed primitive registry. | Choose one policy at that boundary, or keep adapters and trust domains distinct; calling both interpreters does not make their authority equivalent. |
+| K4 | MCP-007, SM-008, SM-022, SM-023, SM-024, SM-025, SM-026, SM-030 | Exact fidelity versus lossy representation | A lossy vector/topic approximation is accepted as the replacement for the same exact reconstruction/deep-equality obligation. | Use approximate representations for discovery/ranking; retain canonical objects and exact verification for identity-sensitive claims. |
+| K5 | SM-010, SM-013 | Two producers for one outstanding screen | Generated and Mirror producers both replace or complete the same still-outstanding request. | Select a producer per request and preserve its stored expected inputs/publication state until returns are accepted. |
+| K6 | SM-016, SM-002, SM-019, SM-020 | Deletion versus required evidence retention | The sole required copy of the same evidence is deleted before its preservation/readback obligation is satisfied. | Seal and preserve the required evidence first; bind retrieval to its version and permission. Branch deletion and encrypted evidence retention are not themselves contradictions. |
+| K7 | MCP-003, SM-012 | Global exclusivity versus concurrent eligibility | The same global authority must permit exactly one active worker and simultaneously permit several active workers. | Scope pointers/grants per task or serialize the shared commit. Parallel preparation and exclusive state mutation can coexist. |
+
+Other differences are **guarantee gaps**, not established contradictions. MCP-005's database atomicity must not be attributed to SM-012's promise chain. MCP-006's duplicate-result protection must not be attributed to SM-035 solely because it retries. The uncertainty about AIChannel's separate event/state writes is a property to inspect, not a demonstrated runtime failure.
+
+### A8. Apparent conflicts that disappear when the axes are separated
+
+| Apparent conflict | Why both can be correct |
+| --- | --- |
+| Full replay (MCP-007) versus restricted projection (MCP-004) | Replay verifies full state internally; actor environments can still expose only permitted views. |
+| Accept an old-revision retry (MCP-006) versus reject a stale request (MCP-002) | An identical known action can return its cached original result; a new stale action is a different case. |
+| Parallel workers (SM-012) versus serialized state changes (MCP-005) | Preparation can be parallel while acceptance/commit is serialized. Transactional atomicity still needs its own implementation. |
+| Paired revisions (SM-003) versus old-version pinning (SM-017) | A newly introduced contract/runtime version need not migrate an already-running transaction. |
+| Different token counts (MCP-010 and SM-037) | Different tokenizers, models or transformed texts are different units/objects; equality is not expected. |
+| Different grouping results (SM-023 and SM-024) | Complete linkage and average linkage encode different merge rules. They are alternatives unless one contract simultaneously requires both exact partitions. |
+| Canonical design source (SM-032) versus specification authority (MCP-001) | A working copy can be canonical within a design project while remaining inactive as account-level instruction. |
+| Collected output (SM-021) versus verified coverage (SM-020) | Collection, reading, analysis and verification are separate evidence states. One does not silently imply the others. |
+
+### A9. A compatible composition of the fundamental categories
+
+This diagram is a conceptual composition, not a claim that a new combined system has been implemented. Inference supplies proposals; authority accepts transitions; execution produces effects; evidence returns observations. State/projection determine the context supplied to the next inference step.
+
+```mermaid
+flowchart TD
+    G["G: governing contracts"] --> T["T: authority and progression"]
+    S["S: durable state and identity"] --> P["P: permitted representation"]
+    P --> I["I: inference and proposals"]
+    I --> T
+    T --> X["X: execution and resources"]
+    X --> V["V: evidence and verification"]
+    V --> T
+    T --> S
+    M["M: measurement and indexing"] --> V
+```
+
+Measurement informs verification but does not, by itself, prove effects or semantic truth. Data from execution returns to decision-making through the appropriate evidence and visibility boundaries.
+
+### A10. What can be unified, and what must remain distinct
+
+- Share the vocabulary for **identity, revision, authority, projection, receipt and evidence**, while retaining the different actor/action/transaction/run scopes.
+- Reuse a common **guarded-transition pattern** without merging game rules, worker scheduling and semantic evaluator judgments into one undifferentiated validator.
+- Treat Mirror and generated screens as **different producers behind a compatible screen contract**, with one producer and one active expected-return contract per request.
+- Treat NMF, BERTopic, centroid assignment, lexical retrieval and image ranking as **related transformation strategies**, not interchangeable scores or calibrated probabilities.
+- Keep **transport success, execution success, persisted state, observed external effect and semantic adequacy** as distinct claims.
+- Keep **visibility restriction, exact fidelity, approximate relevance and context size** as independent design choices. Maximizing one can work against another; the intended recipient and task decide the tradeoff.
+
+Review boundary: this appendix classifies all 49 entries, registers 49 explicit relations and seven conditional conflict tests, and exposes common conceptual parents. It does not exhaustively decide all 1,176 pairs, prove integration safety, change any source implementation or activate the revoked Job-008 approval.
