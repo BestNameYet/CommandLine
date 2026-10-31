@@ -1,0 +1,97 @@
+name: Extract ChatGPT shared conversation HTML
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/extract-chatgpt-share-html.yml
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch raw HTML (without rendering)
+        shell: bash
+        run: |
+          mkdir -p capture
+          set +e
+          curl --location --silent --show-error --compressed \
+            --connect-timeout 15 --max-time 75 --retry 2 \
+            --user-agent 'Mozilla/5.0 (compatible; GitHubActionsHTMLCapture/1.0)' \
+            --dump-header capture/response.headers \
+            --output capture/response.html \
+            --write-out '%{http_code}' \
+            'https://chatgpt.com/share/6ae571f1-fee8-83e8-8fd0-4cc791eb5920?ogimg=plain' \
+            > capture/http-status.txt
+          code=$?
+          set -e
+          printf '%s\n' "$code" > capture/curl-exit-code.txt
+          echo "HTTP status: $(cat capture/http-status.txt)"
+          echo "curl exit code: $code"
+          wc -c capture/response.html || true
+      - name: Extract HTML text and embedded script payloads
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import json, re
+          root = Path('capture')
+          data = (root / 'response.html').read_bytes() if (root / 'response.html').exists() else b''
+          text = data.decode('utf-8', 'replace')
+          class Capture(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.in_script = False
+                  self.scripts = []
+                  self.current = []
+                  self.visible = []
+                  self.hidden = 0
+              def handle_starttag(self, tag, attrs):
+                  if tag == 'script':
+                      self.in_script = True
+                      self.current = []
+                  if tag in ('style','noscript'):
+                      self.hidden += 1
+              def handle_endtag(self, tag):
+                  if tag == 'script':
+                      self.scripts.append(''.join(self.current))
+                      self.in_script = False
+                      self.current = []
+                  if tag in ('style','noscript'):
+                      self.hidden = max(self.hidden - 1, 0)
+              def handle_data(self, s):
+                  if self.in_script:
+                      self.current.append(s)
+                  elif not self.hidden and s.strip():
+                      self.visible.append(s.strip())
+          parser = Capture()
+          parser.feed(text)
+          (root / 'visible-text.txt').write_text('\n'.join(parser.visible), encoding='utf-8')
+          (root / 'embedded-scripts.txt').write_text(
+              '\n\n===== SCRIPT BLOCK =====\n\n'.join(parser.scripts), encoding='utf-8')
+          summary = {
+              'url': 'https://chatgpt.com/share/6ae571f1-fee8-83e8-8fd0-4cc791eb5920?ogimg=plain',
+              'http_status': (root / 'http-status.txt').read_text().strip(),
+              'curl_exit_code': (root / 'curl-exit-code.txt').read_text().strip(),
+              'html_bytes': len(data),
+              'script_blocks': len(parser.scripts),
+              'contains_next_f': '__next_f' in text,
+              'contains_next_data': '__NEXT_DATA__' in text,
+              'contains_chat_messages': bool(re.search(r'conversation|message',text,re.I))
+          }
+          (root / 'summary.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(summary,indent=2))
+          PY
+      - name: Upload raw response and extracted payloads
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chatgpt-share-raw-html
+          path: capture/
+          if-no-files-found: warn
+          retention-days: 30
