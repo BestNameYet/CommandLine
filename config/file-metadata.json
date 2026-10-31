@@ -121,6 +121,9 @@
     },
     "workspaces/api-to-nodejs/research/idea-inventory-report.md": {
       "description": "49-record pinned MCP-Collaborative/StateMachines inventory with18 coverage dispositions and70 evidence references; AppendixA adds8 functional categories, complete49-idea level/role crosswalk,49 typed relationships,9 derived abstractions and7 conditional conflict tests. Source/specification/test/historical distinctions and non-exhaustive all-pairs limits retained."
+    },
+    ".github/workflows/extract-chatgpt-share-html.yml": {
+      "description": "On push or manual dispatch, retrieves the raw HTTP response of a specified public ChatGPT share link, saves HTML, headers, HTTP status, visible text and embedded script payloads as a 30-day GitHub Actions artifact."
     }
   }
 }
