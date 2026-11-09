@@ -19,7 +19,7 @@
       "description": "Repository overview requiring all agents to receive jobs and update completion progress in central Issue 7 queue comment 6389130786, with Issue 6 reserved for queue updates and existing workflow SHA-copy requirements retained. Defines a complete nullable job return record with verbatim prompts, submission nonce, per-step worker assignment/nonces, next-available-step selection, action/file paths and comment IDs, per-file change history, and final results. Requires every user order and follow-up change to be recorded through Issue 6 into the central Issue 7 queue and verified before implementation."
     },
     "config/file-metadata.json": {
-      "description": "Repository file metadata including the seven active workflow copies in workspaces/api-to-nodejs/workflows/."
+      "description": "Repository file metadata including the eight active workflow copies in workspaces/api-to-nodejs/workflows/."
     },
     ".github/workflows/issue-6-standard.yml": {
       "description": "Read-only reusable workflow for ordinary gh commands and normalization. Supports owner-edited commands in the first five reserved Issue 6 comments."
@@ -124,6 +124,11 @@
     },
     ".github/workflows/extract-chatgpt-share-html.yml": {
       "description": "On push or manual dispatch, retrieves the raw HTTP response of a specified public ChatGPT share link, saves HTML, headers, HTTP status, visible text and embedded script payloads as a 30-day GitHub Actions artifact."
+    },
+    "workspaces/api-to-nodejs/workflows/extract-chatgpt-share-html.yml": {
+      "description": "Exact saved copy of the active ChatGPT shared-page HTML capture workflow; restores complete workflow SHA comparison.",
+      "source": ".github/workflows/extract-chatgpt-share-html.yml",
+      "sourceBlobSha": "dac99f399c7ded72dc9ac39c100f28243cd0f2fa"
     }
   }
 }
